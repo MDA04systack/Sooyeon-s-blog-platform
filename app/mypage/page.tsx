@@ -5,6 +5,7 @@ import Footer from '@/components/Footer'
 import MyPageClient from '@/components/MyPageClient'
 import Link from 'next/link'
 import type { Post } from '@/types/post'
+import type { MyComment } from '@/types/comment'
 
 export default async function MyPostsPage() {
     const supabase = await createClient()
@@ -50,6 +51,15 @@ export default async function MyPostsPage() {
     const bookmarkedPosts = (bookmarksData || [])
         .map(bookmark => bookmark.posts)
         .filter(Boolean) as unknown as Post[]
+
+    // Fetch user's own comments with post info
+    const { data: myCommentsData } = await supabase
+        .from('comments')
+        .select('id, content, created_at, updated_at, post_id, parent_id, posts(title, slug)')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+
+    const myComments = (myCommentsData || []) as unknown as MyComment[]
 
     return (
         <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]">
@@ -118,6 +128,7 @@ export default async function MyPostsPage() {
                         <MyPageClient
                             myPosts={(myPostsData || []) as unknown as Post[]}
                             bookmarkedPosts={bookmarkedPosts}
+                            myComments={myComments}
                         />
                     </div>
                 </div>
@@ -126,3 +137,4 @@ export default async function MyPostsPage() {
         </div>
     )
 }
+
