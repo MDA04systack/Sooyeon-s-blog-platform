@@ -1,39 +1,62 @@
 # DevLog (개발자를 위한 기술 블로그)
 
-현대적인 웹 기술 스택인 **Next.js**와 **Supabase**를 활용하여 구축된 개인 블로그 및 게시물 공유 플랫폼입니다. 깔끔한 UI와 풍부한 텍스트 에디터, 다크 모드, 북마크 기능을 제공합니다.
+현대적인 웹 기술 스택인 **Next.js**와 **Supabase**를 활용하여 구축된 개인 블로그 및 게시물 공유 플랫폼입니다. 아이디 기반 인증, 닉네임 시스템, 댓글 및 북마크 기능을 갖춘 완성도 높은 블로그 서비스입니다.
 
 🔗 **[Live Demo 보러가기](https://sooyeon-s-blog-platform.vercel.app/)**
 
-![DevLog Home](https://sooyeon-s-blog-platform.vercel.app/og-image.png) <!-- 스크린샷 썸네일 경로가 있다면 교체해주세요 -->
-
 ## 🚀 기술 스택 (Tech Stack)
 
-* **Framework**: [Next.js 14](https://nextjs.org/) (App Router, Server/Client Components)
-* **Language**: [TypeScript](https://www.typescriptlang.org/)
-* **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-* **Backend / Database**: [Supabase](https://supabase.com/) (PostgreSQL, Auth, RLS Policies)
-* **Deployment**: [Vercel](https://vercel.com/)
-* **Markdown Processor**: `react-markdown`, `remark-gfm`, `react-syntax-highlighter`
+| 분류 | 기술 |
+|------|------|
+| Framework | [Next.js 14](https://nextjs.org/) (App Router, Server/Client Components) |
+| Language | [TypeScript](https://www.typescriptlang.org/) |
+| Styling | [Tailwind CSS](https://tailwindcss.com/) |
+| Backend / DB | [Supabase](https://supabase.com/) (PostgreSQL, Auth, RLS, Storage) |
+| Deployment | [Vercel](https://vercel.com/) |
+| Markdown | `react-markdown`, `remark-gfm`, `react-syntax-highlighter` |
 
 ## ✨ 주요 기능 (Key Features)
 
-1. **사용자 인증 (Authentication)**
-   * Supabase Auth를 활용한 안전한 이메일 회원가입 및 로그인 시스템
-2. **풀스택 마크다운 에디터 (Markdown Editor)**
-   * 코딩 블록구문 강조(Syntax Highlighting) 및 실시간 미리보기가 지원되는 에디터
-   * 글 발행 상태 관리: **임시저장(Draft) / 공개(Published) / 비공개(Private)** 기능
-3. **블로그 읽기 경험 최적화**
-   * **다크 모드 / 라이트 모드** 완벽 지원 (테마 전환 및 로컬 스토리지 저장)
-   * 조회수(View Count) 측정 및 인기순 정렬 필터 기능
-   * 각 페이지별 읽기 소요 시간(Read Time) 자동 계산 기능
-4. **마이 페이지 & 북마크 (My Page & Bookmarks)**
-   * 본인이 작성한 글과 북마크한 글을 탭으로 분리하여 관리
-   * 게시물 상세 페이지에서 직접 '북마크 토글' 및 빠르고 쉬운 'URL 클립보드 복사(공유)' 기능
-   * 본인 작성 글에 대한 인라인 수정(Edit) 및 삭제(Delete) 아이콘 제공
+### 🔑 인증 시스템
+- **아이디(ID) 기반 로그인**: 이메일 대신 설정한 고유 아이디와 비밀번호로 로그인
+- **커스텀 회원가입**: 이름, 아이디(중복확인), 닉네임(중복확인), 비밀번호(확인 포함), 이메일 5단계 입력 폼
+- **구글(Google) 소셜 로그인** 지원
+- **아이디 찾기**: 가입 이메일로 매직링크 발송 후 로그인 시 아이디 확인
+- **비밀번호 찾기**: 이메일로 재설정 링크 발송 (30분 유효)
+
+### ⚙️ 마이 페이지 & 계정 설정
+- **계정 설정 페이지** (`/mypage/settings`): 비밀번호 재확인 보안 진입 보호
+- 닉네임 변경 (중복확인 포함), 이메일 변경, 비밀번호 재설정, 회원 탈퇴
+- **내가 쓴 글 / 북마크한 글** 탭으로 분리된 마이 페이지
+
+### 📝 게시글 기능
+- **마크다운 에디터**: 코드 블록 구문 강조(Syntax Highlighting) 및 실시간 미리보기
+- 발행 상태 관리: **임시저장 / 공개 / 비공개**
+- 조회수(View Count) 측정, 읽기 소요 시간 자동 계산
+- 인기순 정렬 필터
+
+### 💬 댓글 시스템
+- 게시글 하단에 고정 높이 스크롤 댓글 영역
+- 댓글 작성 · 수정 · 삭제(본인 댓글만), **대댓글(답글)** 지원
+- 작성자 닉네임, 작성일시 표시
+
+### 🔖 기타 기능
+- **북마크**: 게시글 상세 페이지 상단 아이콘으로 북마크 토글
+- **URL 복사** 공유 기능
+- **다크 모드 / 라이트 모드** 완벽 지원 (로컬 스토리지 저장)
+- 게시글 수정 · 삭제 아이콘 (작성자에게만 표시)
+
+## 📁 데이터베이스 스키마 (Supabase)
+
+```
+categories          – 카테고리
+posts               – 게시글 (category_id FK)
+profiles            – 사용자 프로필 (username, nickname, full_name)
+bookmarks           – 북마크 (post_id, user_id)
+comments            – 댓글 · 대댓글 (post_id, user_id, parent_id FK)
+```
 
 ## 💻 로컬 개발 환경 설정 (Getting Started)
-
-프로젝트를 로컬 환경에서 실행하려면 다음 단계를 따르세요.
 
 ### 1. 레포지토리 클론
 ```bash
@@ -47,7 +70,7 @@ npm install
 ```
 
 ### 3. 환경 변수 설정
-루트 디렉토리에 `.env.local` 파일을 생성하고, 본인의 Supabase 프로젝트 정보를 입력합니다.
+루트 디렉토리에 `.env.local` 파일을 생성하고 본인의 Supabase 프로젝트 정보를 입력합니다.
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -57,24 +80,20 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```bash
 npm run dev
 ```
+브라우저에서 `http://localhost:3000`에 접속합니다.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Supabase 마이그레이션 적용
+```bash
+npx supabase db push
+```
+`supabase/migrations/` 폴더의 SQL 파일들이 순차적으로 적용됩니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 추가 대시보드 설정 (배포 시 필수)
+1. **비밀번호 재설정 링크 유효기간**: Authentication → Providers → Email → `Email link expiration` 값을 `1800`(30분)으로 변경
+2. **구글 소셜 로그인**: Authentication → Providers → Google → Client ID & Secret 입력
+3. **배포 URL 등록**: Authentication → URL Configuration → Site URL에 Vercel 도메인 추가
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🌐 배포 (Vercel)
+1. Vercel에 GitHub 레포지토리 Import
+2. Environment Variables에 `NEXT_PUBLIC_SUPABASE_URL` 및 `NEXT_PUBLIC_SUPABASE_ANON_KEY` 추가
+3. Deploy 클릭
