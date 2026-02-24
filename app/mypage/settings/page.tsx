@@ -223,7 +223,7 @@ export default function AccountSettingsPage() {
                 <div className={sectionCls}>
                     <h2 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1">이메일 변경</h2>
                     <p className="text-xs text-[var(--text-muted)] mb-4">
-                        변경 요청 후 <strong>① 기존 이메일</strong>과 <strong>② 새 이메일</strong> 양쪽에 발송된 확인 링크를 모두 클릭해야 변경이 완료됩니다.
+                        변경 요청 후 <strong>새 이메일</strong>로 발송된 확인 링크를 클릭하면 변경이 완료됩니다.
                     </p>
                     <form onSubmit={handleEmailChange} className="space-y-3">
                         <div>
