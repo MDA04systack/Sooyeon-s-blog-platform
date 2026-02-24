@@ -26,7 +26,8 @@
 ### ⚙️ 마이 페이지 & 계정 설정
 - **계정 설정 페이지** (`/mypage/settings`): 비밀번호 재확인 보안 진입 보호
 - 닉네임 변경 (중복확인 포함), 이메일 변경, 비밀번호 재설정, 회원 탈퇴
-- **내가 쓴 글 / 북마크한 글** 탭으로 분리된 마이 페이지
+- **내가 쓴 글 / 북마크한 글 / 내가 쓴 댓글** 3탭으로 구성된 마이 페이지
+- **내가 쓴 댓글**: 댓글을 작성한 게시글 제목 링크로 바로 이동, 인라인 수정, 단일·체크박스 다중·전체 선택 삭제
 
 ### 📝 게시글 기능
 - **마크다운 에디터**: 코드 블록 구문 강조(Syntax Highlighting) 및 실시간 미리보기
@@ -89,7 +90,14 @@ npx supabase db push
 
 ### 추가 대시보드 설정 (배포 시 필수)
 1. **비밀번호 재설정 링크 유효기간**: Authentication → Providers → Email → `Email link expiration` 값을 `1800`(30분)으로 변경
-2. **배포 URL 등록**: Authentication → URL Configuration → Site URL에 Vercel 도메인 추가
+2. **Secure email change 비활성화**: Authentication → Providers → Email → `Secure email change` 토글 **OFF** (새 이메일에서만 확인 링크 클릭)
+3. **Site URL 등록**: Authentication → URL Configuration → `Site URL`에 Vercel 도메인 추가
+4. **Redirect URLs 등록**: Authentication → URL Configuration → `Redirect URLs`에 아래 두 URL 추가
+   ```
+   https://<your-vercel-domain>/auth/callback
+   http://localhost:3000/auth/callback
+   ```
+   > 비밀번호 재설정·아이디 찾기 이메일 링크가 정상 동작하려면 반드시 필요합니다.
 
 ## 🌐 배포 (Vercel)
 1. Vercel에 GitHub 레포지토리 Import
