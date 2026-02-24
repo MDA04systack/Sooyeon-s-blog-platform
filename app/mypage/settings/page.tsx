@@ -98,11 +98,18 @@ export default function AccountSettingsPage() {
     // ─── Email change ─────────────────────────────────────────
     async function handleEmailChange(e: React.FormEvent) {
         e.preventDefault()
+        if (!newEmail.trim()) return
         setLoading(true)
-        const { error } = await supabase.auth.updateUser({ email: newEmail.trim() })
+        const { error } = await supabase.auth.updateUser(
+            { email: newEmail.trim() },
+            { emailRedirectTo: `${location.origin}/auth/callback?next=/mypage/settings` }
+        )
         setLoading(false)
-        if (error) showMsg(error.message, 'error')
-        else showMsg('확인 이메일을 발송했습니다. 새 이메일을 확인해주세요.', 'success')
+        if (error) {
+            showMsg(`오류: ${error.message}`, 'error')
+        } else {
+            showMsg('확인 이메일을 발송했습니다. ① 기존 이메일 ② 새 이메일, 양쪽 수신함을 모두 확인해주세요.', 'success')
+        }
     }
 
     // ─── Send password reset ──────────────────────────────────
@@ -170,8 +177,8 @@ export default function AccountSettingsPage() {
 
                 {message && (
                     <div className={`p-3 text-sm rounded-lg border ${message.type === 'success'
-                            ? 'text-green-400 bg-green-900/20 border-green-800'
-                            : 'text-red-400 bg-red-900/20 border-red-800'
+                        ? 'text-green-400 bg-green-900/20 border-green-800'
+                        : 'text-red-400 bg-red-900/20 border-red-800'
                         }`}>{message.text}</div>
                 )}
 
@@ -214,7 +221,10 @@ export default function AccountSettingsPage() {
 
                 {/* Email change */}
                 <div className={sectionCls}>
-                    <h2 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-4">이메일 변경</h2>
+                    <h2 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1">이메일 변경</h2>
+                    <p className="text-xs text-[var(--text-muted)] mb-4">
+                        변경 요청 후 <strong>① 기존 이메일</strong>과 <strong>② 새 이메일</strong> 양쪽에 발송된 확인 링크를 모두 클릭해야 변경이 완료됩니다.
+                    </p>
                     <form onSubmit={handleEmailChange} className="space-y-3">
                         <div>
                             <label className={labelCls} htmlFor="newEmail">새 이메일 주소</label>
@@ -224,7 +234,7 @@ export default function AccountSettingsPage() {
                         </div>
                         <button type="submit" disabled={loading}
                             className="px-4 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-medium transition-colors disabled:opacity-60">
-                            이메일 변경 요청
+                            {loading ? '전송 중...' : '이메일 변경 요청'}
                         </button>
                     </form>
                 </div>
@@ -272,3 +282,4 @@ export default function AccountSettingsPage() {
         </div>
     )
 }
+
