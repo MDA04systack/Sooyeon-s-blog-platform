@@ -22,7 +22,7 @@ export default function FindIdPage() {
         // redirected to /find-id/result where we show their username.
         const { error: magicErr } = await supabase.auth.signInWithOtp({
             email: email.trim(),
-            options: { emailRedirectTo: `${location.origin}/find-id/result` },
+            options: { emailRedirectTo: `${location.origin}/auth/callback?next=/find-id/result` },
         })
 
         setLoading(false)
