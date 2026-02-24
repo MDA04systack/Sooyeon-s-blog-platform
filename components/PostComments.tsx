@@ -18,6 +18,179 @@ interface PostCommentsProps {
     postId: string
 }
 
+// ─── helpers ──────────────────────────────────────────────────────────────────
+const textareaCls =
+    'w-full px-3 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-faint)] focus:outline-none focus:ring-2 focus:ring-indigo-500/60 resize-none transition-all'
+
+function formatDate(iso: string) {
+    const d = new Date(iso)
+    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+}
+
+// ─── CommentItem ─────────────────────────────────────────────────────────────
+// Defined OUTSIDE PostComments so it doesn't get recreated on every render,
+// which would cause textarea focus to be lost while typing.
+interface CommentItemProps {
+    comment: Comment
+    isReply?: boolean
+    user: User | null
+    replyingTo: string | null
+    replyText: Record<string, string>
+    editingId: string | null
+    editText: string
+    submitting: boolean
+    childReplies: Comment[]
+    onToggleReply: (id: string) => void
+    onReplyTextChange: (id: string, value: string) => void
+    onCancelReply: () => void
+    onSubmitReply: (parentId: string) => void
+    onStartEdit: (id: string, content: string) => void
+    onEditTextChange: (text: string) => void
+    onCancelEdit: () => void
+    onSaveEdit: (id: string) => void
+    onDeleteComment: (id: string) => void
+    // For nested replies we pass along the same handlers
+    allComments: Comment[]
+}
+
+function CommentItem({
+    comment,
+    isReply = false,
+    user,
+    replyingTo,
+    replyText,
+    editingId,
+    editText,
+    submitting,
+    childReplies,
+    onToggleReply,
+    onReplyTextChange,
+    onCancelReply,
+    onSubmitReply,
+    onStartEdit,
+    onEditTextChange,
+    onCancelEdit,
+    onSaveEdit,
+    onDeleteComment,
+    allComments,
+}: CommentItemProps) {
+    return (
+        <div className={`${isReply ? 'ml-6 pl-4 border-l-2 border-[var(--border)]' : ''} py-3`}>
+            <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm font-semibold text-[var(--text-primary)]">
+                            {comment.profiles?.nickname ?? '알 수 없음'}
+                        </span>
+                        <span className="text-xs text-[var(--text-faint)]">{formatDate(comment.created_at)}</span>
+                        {comment.updated_at !== comment.created_at && (
+                            <span className="text-xs text-[var(--text-faint)] italic">(수정됨)</span>
+                        )}
+                    </div>
+
+                    {editingId === comment.id ? (
+                        <div className="space-y-2">
+                            <textarea
+                                rows={2}
+                                value={editText}
+                                onChange={e => onEditTextChange(e.target.value)}
+                                className={textareaCls}
+                                autoFocus
+                            />
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => onSaveEdit(comment.id)}
+                                    className="px-3 py-1 text-xs rounded-md bg-indigo-500 hover:bg-indigo-400 text-white transition-colors"
+                                >저장</button>
+                                <button
+                                    onClick={onCancelEdit}
+                                    className="px-3 py-1 text-xs rounded-md border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--bg-input)] transition-colors"
+                                >취소</button>
+                            </div>
+                        </div>
+                    ) : (
+                        <p className="text-sm text-[var(--text-body)] whitespace-pre-wrap break-words">{comment.content}</p>
+                    )}
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center gap-1 shrink-0">
+                    {!isReply && (
+                        <button
+                            onClick={() => onToggleReply(comment.id)}
+                            className="text-xs px-2 py-1 rounded text-[var(--text-muted)] hover:text-indigo-400 hover:bg-indigo-500/10 transition-colors"
+                        >답글</button>
+                    )}
+                    {user?.id === comment.user_id && (
+                        <>
+                            <button
+                                onClick={() => onStartEdit(comment.id, comment.content)}
+                                className="text-xs px-2 py-1 rounded text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-input)] transition-colors"
+                            >수정</button>
+                            <button
+                                onClick={() => onDeleteComment(comment.id)}
+                                className="text-xs px-2 py-1 rounded text-[var(--text-muted)] hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                            >삭제</button>
+                        </>
+                    )}
+                </div>
+            </div>
+
+            {/* Reply form */}
+            {replyingTo === comment.id && (
+                <div className="mt-3 space-y-2">
+                    <textarea
+                        rows={2}
+                        value={replyText[comment.id] ?? ''}
+                        onChange={e => onReplyTextChange(comment.id, e.target.value)}
+                        placeholder="답글을 입력하세요..."
+                        className={textareaCls}
+                        autoFocus
+                    />
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => onSubmitReply(comment.id)}
+                            disabled={submitting}
+                            className="px-3 py-1 text-xs rounded-md bg-indigo-500 hover:bg-indigo-400 text-white transition-colors disabled:opacity-60"
+                        >답글 등록</button>
+                        <button
+                            onClick={onCancelReply}
+                            className="px-3 py-1 text-xs rounded-md border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--bg-input)] transition-colors"
+                        >취소</button>
+                    </div>
+                </div>
+            )}
+
+            {/* Nested replies */}
+            {childReplies.map(reply => (
+                <CommentItem
+                    key={reply.id}
+                    comment={reply}
+                    isReply
+                    user={user}
+                    replyingTo={replyingTo}
+                    replyText={replyText}
+                    editingId={editingId}
+                    editText={editText}
+                    submitting={submitting}
+                    childReplies={[]}
+                    onToggleReply={onToggleReply}
+                    onReplyTextChange={onReplyTextChange}
+                    onCancelReply={onCancelReply}
+                    onSubmitReply={onSubmitReply}
+                    onStartEdit={onStartEdit}
+                    onEditTextChange={onEditTextChange}
+                    onCancelEdit={onCancelEdit}
+                    onSaveEdit={onSaveEdit}
+                    onDeleteComment={onDeleteComment}
+                    allComments={allComments}
+                />
+            ))}
+        </div>
+    )
+}
+
+// ─── PostComments ─────────────────────────────────────────────────────────────
 export default function PostComments({ postId }: PostCommentsProps) {
     const supabase = createClient()
     const [user, setUser] = useState<User | null>(null)
@@ -26,7 +199,6 @@ export default function PostComments({ postId }: PostCommentsProps) {
     const [newComment, setNewComment] = useState('')
     const [submitting, setSubmitting] = useState(false)
 
-    // Per-comment state maps
     const [replyingTo, setReplyingTo] = useState<string | null>(null)
     const [replyText, setReplyText] = useState<Record<string, string>>({})
     const [editingId, setEditingId] = useState<string | null>(null)
@@ -40,7 +212,6 @@ export default function PostComments({ postId }: PostCommentsProps) {
     async function fetchComments() {
         setLoading(true)
 
-        // Step 1: fetch comments (no join)
         const { data: commentsData, error } = await supabase
             .from('comments')
             .select('id, content, created_at, updated_at, user_id, parent_id')
@@ -53,7 +224,6 @@ export default function PostComments({ postId }: PostCommentsProps) {
             return
         }
 
-        // Step 2: fetch nicknames for all unique user_ids
         const userIds = [...new Set(commentsData.map(c => c.user_id))]
         const { data: profilesData } = await supabase
             .from('profiles')
@@ -65,7 +235,6 @@ export default function PostComments({ postId }: PostCommentsProps) {
             profileMap[p.id] = p.nickname
         }
 
-        // Step 3: merge
         const merged: Comment[] = commentsData.map(c => ({
             ...c,
             profiles: profileMap[c.user_id] ? { nickname: profileMap[c.user_id] } : null,
@@ -108,98 +277,28 @@ export default function PostComments({ postId }: PostCommentsProps) {
         await fetchComments()
     }
 
-    function formatDate(iso: string) {
-        const d = new Date(iso)
-        return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
-    }
-
-    // Separate top-level and replies
     const topLevel = comments.filter(c => !c.parent_id)
-    const replies = (parentId: string) => comments.filter(c => c.parent_id === parentId)
+    const getReplies = (parentId: string) => comments.filter(c => c.parent_id === parentId)
 
-    const textareaCls = "w-full px-3 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-faint)] focus:outline-none focus:ring-2 focus:ring-indigo-500/60 resize-none transition-all"
-
-    const CommentItem = ({ comment, isReply = false }: { comment: Comment; isReply?: boolean }) => (
-        <div className={`${isReply ? 'ml-6 pl-4 border-l-2 border-[var(--border)]' : ''} py-3`}>
-            <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                        <span className="text-sm font-semibold text-[var(--text-primary)]">
-                            {comment.profiles?.nickname ?? '알 수 없음'}
-                        </span>
-                        <span className="text-xs text-[var(--text-faint)]">{formatDate(comment.created_at)}</span>
-                        {comment.updated_at !== comment.created_at && (
-                            <span className="text-xs text-[var(--text-faint)] italic">(수정됨)</span>
-                        )}
-                    </div>
-
-                    {editingId === comment.id ? (
-                        <div className="space-y-2">
-                            <textarea rows={2} value={editText} onChange={e => setEditText(e.target.value)}
-                                className={textareaCls} />
-                            <div className="flex gap-2">
-                                <button onClick={() => saveEdit(comment.id)}
-                                    className="px-3 py-1 text-xs rounded-md bg-indigo-500 hover:bg-indigo-400 text-white transition-colors">저장</button>
-                                <button onClick={() => setEditingId(null)}
-                                    className="px-3 py-1 text-xs rounded-md border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--bg-input)] transition-colors">취소</button>
-                            </div>
-                        </div>
-                    ) : (
-                        <p className="text-sm text-[var(--text-body)] whitespace-pre-wrap break-words">{comment.content}</p>
-                    )}
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-1 shrink-0">
-                    {!isReply && (
-                        <button onClick={() => {
-                            setReplyingTo(replyingTo === comment.id ? null : comment.id)
-                            setReplyText(prev => ({ ...prev, [comment.id]: '' }))
-                        }}
-                            className="text-xs px-2 py-1 rounded text-[var(--text-muted)] hover:text-indigo-400 hover:bg-indigo-500/10 transition-colors">
-                            답글
-                        </button>
-                    )}
-                    {user?.id === comment.user_id && (
-                        <>
-                            <button onClick={() => { setEditingId(comment.id); setEditText(comment.content) }}
-                                className="text-xs px-2 py-1 rounded text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-input)] transition-colors">
-                                수정
-                            </button>
-                            <button onClick={() => deleteComment(comment.id)}
-                                className="text-xs px-2 py-1 rounded text-[var(--text-muted)] hover:text-red-400 hover:bg-red-500/10 transition-colors">
-                                삭제
-                            </button>
-                        </>
-                    )}
-                </div>
-            </div>
-
-            {/* Reply form */}
-            {replyingTo === comment.id && (
-                <div className="mt-3 space-y-2">
-                    <textarea rows={2}
-                        value={replyText[comment.id] ?? ''}
-                        onChange={e => setReplyText(prev => ({ ...prev, [comment.id]: e.target.value }))}
-                        placeholder="답글을 입력하세요..."
-                        className={textareaCls} />
-                    <div className="flex gap-2">
-                        <button onClick={() => submitReply(comment.id)} disabled={submitting}
-                            className="px-3 py-1 text-xs rounded-md bg-indigo-500 hover:bg-indigo-400 text-white transition-colors disabled:opacity-60">
-                            답글 등록
-                        </button>
-                        <button onClick={() => setReplyingTo(null)}
-                            className="px-3 py-1 text-xs rounded-md border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--bg-input)] transition-colors">취소</button>
-                    </div>
-                </div>
-            )}
-
-            {/* Nested replies */}
-            {replies(comment.id).map(reply => (
-                <CommentItem key={reply.id} comment={reply} isReply />
-            ))}
-        </div>
-    )
+    // Shared handler props passed to CommentItem
+    const itemHandlers = {
+        user,
+        replyingTo,
+        replyText,
+        editingId,
+        editText,
+        submitting,
+        allComments: comments,
+        onToggleReply: (id: string) => setReplyingTo(replyingTo === id ? null : id),
+        onReplyTextChange: (id: string, value: string) => setReplyText(prev => ({ ...prev, [id]: value })),
+        onCancelReply: () => setReplyingTo(null),
+        onSubmitReply: submitReply,
+        onStartEdit: (id: string, content: string) => { setEditingId(id); setEditText(content) },
+        onEditTextChange: (text: string) => setEditText(text),
+        onCancelEdit: () => setEditingId(null),
+        onSaveEdit: saveEdit,
+        onDeleteComment: deleteComment,
+    }
 
     return (
         <section className="mt-12">
@@ -218,8 +317,11 @@ export default function PostComments({ postId }: PostCommentsProps) {
                         className={textareaCls}
                     />
                     <div className="flex justify-end">
-                        <button type="submit" disabled={submitting || !newComment.trim()}
-                            className="px-4 py-2 text-sm rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white font-medium transition-colors disabled:opacity-60">
+                        <button
+                            type="submit"
+                            disabled={submitting || !newComment.trim()}
+                            className="px-4 py-2 text-sm rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white font-medium transition-colors disabled:opacity-60"
+                        >
                             {submitting ? '등록 중...' : '댓글 등록'}
                         </button>
                     </div>
@@ -230,7 +332,7 @@ export default function PostComments({ postId }: PostCommentsProps) {
                 </p>
             )}
 
-            {/* Comment list - fixed height with scroll */}
+            {/* Comment list */}
             <div className="border border-[var(--border)] rounded-xl overflow-hidden">
                 {loading ? (
                     <div className="p-6 text-center text-sm text-[var(--text-muted)]">댓글을 불러오는 중...</div>
@@ -239,7 +341,12 @@ export default function PostComments({ postId }: PostCommentsProps) {
                 ) : (
                     <div className="max-h-[480px] overflow-y-auto divide-y divide-[var(--border)] px-4">
                         {topLevel.map(comment => (
-                            <CommentItem key={comment.id} comment={comment} />
+                            <CommentItem
+                                key={comment.id}
+                                comment={comment}
+                                childReplies={getReplies(comment.id)}
+                                {...itemHandlers}
+                            />
                         ))}
                     </div>
                 )}
