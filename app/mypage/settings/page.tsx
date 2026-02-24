@@ -116,7 +116,7 @@ export default function AccountSettingsPage() {
     async function handlePasswordReset() {
         setLoading(true)
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: `${location.origin}/update-password`,
+            redirectTo: `${location.origin}/auth/callback?next=/update-password`,
         })
         setLoading(false)
         if (error) showMsg(error.message, 'error')
