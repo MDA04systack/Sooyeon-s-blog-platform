@@ -39,12 +39,39 @@ export default function PostComments({ postId }: PostCommentsProps) {
 
     async function fetchComments() {
         setLoading(true)
-        const { data } = await supabase
+
+        // Step 1: fetch comments (no join)
+        const { data: commentsData, error } = await supabase
             .from('comments')
-            .select('id, content, created_at, updated_at, user_id, parent_id, profiles(nickname)')
+            .select('id, content, created_at, updated_at, user_id, parent_id')
             .eq('post_id', postId)
             .order('created_at', { ascending: true })
-        setComments((data as unknown as Comment[]) ?? [])
+
+        if (error || !commentsData) {
+            setComments([])
+            setLoading(false)
+            return
+        }
+
+        // Step 2: fetch nicknames for all unique user_ids
+        const userIds = [...new Set(commentsData.map(c => c.user_id))]
+        const { data: profilesData } = await supabase
+            .from('profiles')
+            .select('id, nickname')
+            .in('id', userIds)
+
+        const profileMap: Record<string, string> = {}
+        for (const p of profilesData || []) {
+            profileMap[p.id] = p.nickname
+        }
+
+        // Step 3: merge
+        const merged: Comment[] = commentsData.map(c => ({
+            ...c,
+            profiles: profileMap[c.user_id] ? { nickname: profileMap[c.user_id] } : null,
+        }))
+
+        setComments(merged)
         setLoading(false)
     }
 
