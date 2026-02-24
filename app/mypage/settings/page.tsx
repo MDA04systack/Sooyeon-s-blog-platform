@@ -108,7 +108,7 @@ export default function AccountSettingsPage() {
         if (error) {
             showMsg(`오류: ${error.message}`, 'error')
         } else {
-            showMsg('확인 이메일을 발송했습니다. ① 기존 이메일 ② 새 이메일, 양쪽 수신함을 모두 확인해주세요.', 'success')
+            showMsg('확인 이메일을 발송했습니다. 새 이메일 수신함을 확인해주세요.', 'success')
         }
     }
 
