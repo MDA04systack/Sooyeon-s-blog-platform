@@ -1,0 +1,133 @@
+# DevLog 홈페이지 구현 완료
+
+요청하신 스크린샷과 동일한 디자인으로 DevLog의 홈페이지를 구현했습니다.
+
+## 구현 상세
+
+1.  **네비게이션 바 ([components/Navbar.tsx](file:///d:/blog-platform/components/Navbar.tsx))**
+    *   좌측: DevLog 로고
+    *   중앙: 검색 바
+    *   우측: 다크모드 토글 아이콘, Supabase Auth 상태에 따른 '로그인' / '회원가입' (세션이 없을 경우) 또는 이메일과 '로그아웃' 버튼(로그인 시)
+2.  **히어로 섹션 ([components/HeroSection.tsx](file:///d:/blog-platform/components/HeroSection.tsx))**
+    *   좌측에는 `is_featured = true`인 게시글 하나를 크게 배치
+    *   우측에는 최신 게시글 2개를 작은 카드로 배치
+3.  **카테고리 필터링 ([components/PostList.tsx](file:///d:/blog-platform/components/PostList.tsx))**
+    *   '전체 보기', '프론트엔드', '백엔드', '데브옵스', '커리어' 탭을 통한 필터링 로직 (상태로 관리하며 Supabase 쿼리 시 반영)
+4.  **블로그 카드 리스트 페이지네이션 ([components/PostList.tsx](file:///d:/blog-platform/components/PostList.tsx), [components/PostCard.tsx](file:///d:/blog-platform/components/PostCard.tsx))**
+    *   썸네일, 카테고리 뱃지, 제목, 요약, 발행일 정보를 보여주는 카드를 3열 그리드로 구현
+    *   하단에 **"더 많은 게시글 보기"** 버튼으로 페이지네이션 기능 구현 (초기 6개 렌더링 후 추가 로드)
+5.  **푸터 ([components/Footer.tsx](file:///d:/blog-platform/components/Footer.tsx))**
+    *   하단에 로고, 저작권, 기타 소셜 링크 포함
+6.  **다크 테마 적용 ([app/globals.css](file:///d:/blog-platform/app/globals.css), [app/layout.tsx](file:///d:/blog-platform/app/layout.tsx))**
+    *   스크린샷의 네이비/블랙 배경과 흰색 텍스트 계열을 CSS 변수 기반 다크 테마로 구성
+
+## 수파베이스 환경 및 마이그레이션 안내
+
+수파베이스 클라이언트 설정([utils/supabase/client.ts](file:///d:/blog-platform/utils/supabase/client.ts))을 구성하여 컴포넌트에서 클라이언트 사이드로 데이터를 패치하도록 구축했습니다.
+
+요청하신 대로 직접 데이터베이스 명령을 실행하지 않았습니다. 데이터베이스 스키마와 샘플 데이터 반영은 다음 리드미 파일에 정리해 두었습니다:
+**[README-db.md](file:///d:/blog-platform/supabase/README-db.md)**
+
+이 파일을 참고하시어 Supabase 대시보드에서 [d:\blog-platform\supabase\migrations\001_initial_schema.sql](file:///d:/blog-platform/supabase/migrations/001_initial_schema.sql) (테이블/정책) 를 먼저 실행하신 후, 이어서 [d:\blog-platform\supabase\seed.sql](file:///d:/blog-platform/supabase/seed.sql) (샘플 데이터 9개) 를 실행해 주시면 홈페이지에 컨텐츠가 정상 노출됩니다.
+
+## 검증 결과
+
+브라우저 에이전트를 통해 확인한 결과 스타일과 구조가 디자인대로 렌더링되고 있습니다.
+*(DB 마이그레이션을 돌리기 전이라 빈 상태로 나타납니다)*
+
+![Home Page Empty State](C:\Users\asiae\.gemini\antigravity\brain\88de9c39-e217-41f0-8881-991ed541172e\full_page_1771913129298.png)
+*(홈페이지 로딩 확인용 브라우저 스크린샷)*
+
+영상 확인(홈페이지): ![브라우저 봇 동작](C:\Users\asiae\.gemini\antigravity\brain\88de9c39-e217-41f0-8881-991ed541172e\home_page_verification_1771913110295.webp)
+
+## 상세 페이지 (Detail Page) 확장 배포
+
+추가로 제공된 스크린샷([detail.png](file:///d:/blog-platform/app/design/detail.png))을 바탕으로 동적 라우팅 기반의 블로그 상세 페이지도 성공적으로 적용 완료했습니다.
+
+1. **상세 페이지 구조 ([app/posts/[slug]/page.tsx](file:///d:/blog-platform/app/posts/%5Bslug%5D/page.tsx))**
+   - 앞서 설계했던 다크테마 Navbar 및 Footer 컴포넌트를 재사용하여 시각적 일관성을 유지
+   - Supabase에서 slug 조회 시, 1대다 JOIN (`categories!inner`)을 통해 카테고리명을 가져와 템플릿에 주입
+
+2. **포스트 헤더 ([components/PostHeader.tsx](file:///d:/blog-platform/components/PostHeader.tsx))**
+   - 상단 카테고리 뱃지 노출
+   - 메인 제목과 그 밑의 작성자 정보(프로필 이미지, 이름, 작성일) 컴포넌트 추가
+   - 컨텐츠의 단어 수를 기반으로 **예상 읽기 시간(소요 시간)** 계산 로직 적용
+   - 북마크(Save), 공유(Share), 더보기(More) 아이콘 버튼 정렬 배치
+
+3. **포스트 본문 ([components/PostContent.tsx](file:///d:/blog-platform/components/PostContent.tsx))**
+   - 16:9 썸네일 이미지를 가로로 꽉 차게 상단 배치
+   - `react-markdown` 라이브러리를 통해 Supabase에서 가져온 Markdown 텍스트를 파싱
+   - 일반 텍스트는 `prose-invert`로 다크 테마 커스터마이징
+   - 코드 블록 지원을 위해 `react-syntax-highlighter` 적용, 스크린샷과 동일한 MacOS 스타일 창출(창 닫기/최소화/최대화 3색 버튼 등) 커스텀
+
+### 상세 화면 검증
+
+![Detail Page Top](C:\Users\asiae\.gemini\antigravity\brain\88de9c39-e217-41f0-8881-991ed541172e\blog_detail_real_top_1771915725509.png)
+*(상세 페이지 상단 - 헤더와 썸네일)*
+
+![Detail Page Full](C:\Users\asiae\.gemini\antigravity\brain\88de9c39-e217-41f0-8881-991ed541172e\blog_detail_complete_view_1771915796911.png)
+*(상세화면 전체 스크린샷 렌더링 검증)*
+
+상세화면 동작 확인: ![브라우저 봇 동작](C:\Users\asiae\.gemini\antigravity\brain\88de9c39-e217-41f0-8881-991ed541172e\detail_page_verification_1771915662331.webp)
+
+## 게시글 작성 페이지 (Write Page)
+
+### 마크다운 에디터 및 상태 관리 구현
+- **경로 보호 로직**: 로그인된 사용자만 `/write`에 접속 가능하도록 처리했습니다.
+- **Split-Pane 에디터 구조**: [write.png](file:///d:/blog-platform/app/design/write.png)와 동일한 레이아웃을 갖는 [MarkdownEditor.tsx](file:///d:/blog-platform/components/MarkdownEditor.tsx) 컴포넌트를 설계했습니다.
+- **자체 커스텀 렌더링**: 상세화면과 완벽히 동일한 스타일과 마크다운 환경을 제공하기 위해 `@tailwindcss/typography`의 `prose` 클래스 없이 독립적인 `MarkdownComponents` 속성을 공유하여 재사용했습니다.
+- **Top Bar 및 툴바 구현**: 볼드, 이탤릭체, 인용구, 코드 블록 삽입 등 주요 단축 버튼을 툴바에 구현했습니다.
+- **글 발행 및 임시저장 (Publish / Draft)**: 데이터베이스(`posts` 테이블)에 `status` 컬럼을 만들어 `draft`, `published`, `private` 등 원하는 상태로 저장할 수 있도록 기능을 분리했습니다.
+
+### 에디터 화면 검증
+
+브라우저 에이전트를 통해 마크다운 에디터에 접근하여 글을 작성하고, 툴바 동작 및 우측 프리뷰가 정상적으로 나타남을 확인했습니다.
+
+에디터 동작 확인 영상: ![에디터 작성 테스트 영상](C:\Users\asiae\.gemini\antigravity\brain\88de9c39-e217-41f0-8881-991ed541172e\write_page_verification_1771917301418.webp)
+
+## 라이트 / 다크 모드 전환 (Theme Toggle) 구현
+하드코딩된 유틸리티 클래스 대신 다이나믹한 CSS 변수를 활용하여, 유연하고 완벽한 테마 스위칭 시스템을 구현했습니다. 라이트 모드 전환 시 네비게이션, 푸터 외에도 본문, 카드 및 에디터 등 전체 애플리케이션에 올바르게 적용됩니다.
+
+### 구현 사항
+- **ThemeProvider 구현**: 사용자 기기 기본 설정을 유지하고 브라우저 `localStorage`에 명시적 테마 값을 캐시할 수 있는 전역 Provider 생성.
+- **다이내믹 컬러 토큰 전환**: [globals.css](file:///d:/blog-platform/app/globals.css) 내부에서 `--bg-primary`, `--bg-card`, `--text-primary` 와 같은 시맨틱 계층형 변수 구축 및 하드코딩된 모든 Tailwind 유틸리티(`bg-slate-800`, `text-white`, `border-white/10`)를 컴포넌트 전체에 걸쳐 교체.
+- **마크다운 및 신택스 하이라이팅 연동**: 블로그 상세 본문 렌더기 내역 또한 테마 모듈을 관측하여 읽기 편안한 라이트 스타일 테마로 대응 구조 설계 (`prose-invert` 동적 제어, 코드블럭 `light/dark` 처리).
+- **테마 토글 연동**: 상단바(Navbar) 내 달/해 버튼이 클릭 시마다 전역 `.light` 클래스가 최상위 `html`에 삽입/제거되도록 연동 완료.
+
+### 다크/라이트 모드 화면 검증
+
+````carousel
+![홈페이지 다크/라이트 모드 전환 적용](C:/Users/asiae/.gemini/antigravity/brain/88de9c39-e217-41f0-8881-991ed541172e/homepage_light_mode_1771922341458.png)
+<!-- slide -->
+![상세페이지 라이트 모드](C:/Users/asiae/.gemini/antigravity/brain/88de9c39-e217-41f0-8881-991ed541172e/post_detail_light_mode_1771922354495.png)
+<!-- slide -->
+![로그인 페이지 라이트 모드 지원](C:/Users/asiae/.gemini/antigravity/brain/88de9c39-e217-41f0-8881-991ed541172e/login_page_light_mode_1771922388228.png)
+````
+
+![테마 전환 브라우저 봇 확인 영상](C:/Users/asiae/.gemini/antigravity/brain/88de9c39-e217-41f0-8881-991ed541172e/verifying_light_mode_theme_1771922319698.webp)
+
+## 마이 페이지 및 북마크 시스템 연동 작동 검증
+사용자 지정된 "내 글" 기능을 "마이 페이지"라는 포괄적인 기능으로 리팩토링하고, Supabase 데이터베이스에 북마크 테이블을 연결하여 기능을 완료했습니다.
+
+### 구현 요약
+- **Supabase Migration**: `bookmarks` 테이블 신규 생성 (post_id, user_id 복합키 유니크)
+- **URL 복사 본 기능**: 상세 페이지 우측 상단 핀과 클립보드 아이콘을 활용한 Native Share 기능 구현
+- **마이페이지 분리**: 기존 `MyPostsClient` 삭제 후 서버-클라이언트 듀얼 렌더링을 활용한 [MyPageClient](file:///d:/blog-platform/components/MyPageClient.tsx#29-236) 탭 분리 구성
+- **북마크 토글**: [PostHeader](file:///d:/blog-platform/components/PostHeader.tsx#22-242) 내부 Client Context 생성 완료.
+
+#### 작동 시뮬레이션 브라우저 봇 영상
+이 영상은 테스트 계정에 로그인하여 게시물에 접속, 즐겨찾기를 클릭한 이후 마이 페이지 탭에서 다시 북마크를 해제하는 일련의 과정을 포함합니다.
+![마이 페이지 북마크 토글 시뮬레이션](C:/Users/asiae/.gemini/antigravity/brain/88de9c39-e217-41f0-8881-991ed541172e/verifying_bookmarks_success_1771923340916.webp)
+
+#### URL 공유 복사 결과
+상세 페이지 우측 상단의 `URL 복사` 버튼 클릭 시 현재 주소창의 주소가 정상적으로 클립보드에 복사딥니다.
+![현재 브라우저 주소 클립보드 복사 검증](C:/Users/asiae/.gemini/antigravity/brain/88de9c39-e217-41f0-8881-991ed541172e/pasted_url_verification_1771923560084.png)
+
+### 수정(Edit) 및 삭제(Delete) 기능 연동 업데이트
+기존에 `PostActions` 컴포넌트로 본문 하단에 존재하던 게시글 수정 및 삭제 버튼을 컴팩트한 **UI 아이콘** 형태로 개선하여 [PostHeader](file:///d:/blog-platform/components/PostHeader.tsx#22-242) 상단 우측 그룹으로 통합했습니다.
+사용자가 직접 작성한 글(`isOwner`)에 접속했을 때만 아이콘이 표시되며, 삭제 버튼 클릭 시 동일 헤더 라인 내에서 삭제 재확인(`삭제할까요? [확인/X]`) UI 팝업이 노출됩니다.
+
+![게시글 상단 아이콘 표시 상태](C:/Users/asiae/.gemini/antigravity/brain/88de9c39-e217-41f0-8881-991ed541172e/post_header_icons_check_1771924012597.png)
+![삭제 버튼 재확인 UI 상태](C:/Users/asiae/.gemini/antigravity/brain/88de9c39-e217-41f0-8881-991ed541172e/delete_confirmation_ui_1771924022049.png)
+
+
