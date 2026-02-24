@@ -67,12 +67,19 @@ export default function MarkdownEditor({ user }: MarkdownEditorProps) {
             : ''
         const slug = (baseSlug || 'post') + `-${Date.now().toString().slice(-6)}`
 
+        // Fetch nickname from profiles table
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('nickname')
+            .eq('id', user.id)
+            .single()
+
         const postData = {
             title: title || '제목 없는 문서',
             slug: `${slug}-${Date.now().toString().slice(-4)}`, // ensure uniqueness
             content,
             status: saveStatus,
-            author_name: user?.user_metadata?.name || user?.email?.split('@')[0] || 'Unknown User',
+            author_name: profile?.nickname || user?.user_metadata?.name || user?.email?.split('@')[0] || 'Unknown User',
             user_id: user.id, // Add user_id for RLS policies!
             category_id: selectedCategoryId || null,
             thumbnail_url: null,
