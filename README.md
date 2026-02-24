@@ -20,7 +20,6 @@
 ### 🔑 인증 시스템
 - **아이디(ID) 기반 로그인**: 이메일 대신 설정한 고유 아이디와 비밀번호로 로그인
 - **커스텀 회원가입**: 이름, 아이디(중복확인), 닉네임(중복확인), 비밀번호(확인 포함), 이메일 5단계 입력 폼
-- **구글(Google) 소셜 로그인** 지원
 - **아이디 찾기**: 가입 이메일로 매직링크 발송 후 로그인 시 아이디 확인
 - **비밀번호 찾기**: 이메일로 재설정 링크 발송 (30분 유효)
 
@@ -90,8 +89,7 @@ npx supabase db push
 
 ### 추가 대시보드 설정 (배포 시 필수)
 1. **비밀번호 재설정 링크 유효기간**: Authentication → Providers → Email → `Email link expiration` 값을 `1800`(30분)으로 변경
-2. **구글 소셜 로그인**: Authentication → Providers → Google → Client ID & Secret 입력
-3. **배포 URL 등록**: Authentication → URL Configuration → Site URL에 Vercel 도메인 추가
+2. **배포 URL 등록**: Authentication → URL Configuration → Site URL에 Vercel 도메인 추가
 
 ## 🌐 배포 (Vercel)
 1. Vercel에 GitHub 레포지토리 Import
