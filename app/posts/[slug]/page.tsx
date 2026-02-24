@@ -4,6 +4,7 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import PostHeader from '@/components/PostHeader'
 import PostContent from '@/components/PostContent'
+import PostComments from '@/components/PostComments'
 import type { Post } from '@/types/post'
 
 export default async function PostDetail({ params }: { params: Promise<{ slug: string }> }) {
@@ -62,6 +63,9 @@ export default async function PostDetail({ params }: { params: Promise<{ slug: s
                     postSlug={decodedSlug}
                 />
                 <PostContent post={post as unknown as Post} />
+                <div className="max-w-3xl mx-auto px-6 pb-20">
+                    <PostComments postId={post.id} />
+                </div>
             </main>
             <Footer />
         </div>
