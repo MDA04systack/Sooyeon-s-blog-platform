@@ -15,10 +15,10 @@ export default async function MyPostsPage() {
         redirect('/login')
     }
 
-    // Fetch profile (nickname, username)
+    // Fetch profile (nickname, username, suspended_until)
     const { data: profile } = await supabase
         .from('profiles')
-        .select('username, nickname, full_name')
+        .select('username, nickname, full_name, suspended_until')
         .eq('id', user.id)
         .single()
 
@@ -87,6 +87,13 @@ export default async function MyPostsPage() {
                                         </p>
                                     </div>
                                 </div>
+
+                                {profile?.suspended_until && new Date(profile.suspended_until) > new Date() && (
+                                    <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-lg text-center">
+                                        <p className="text-rose-500 font-bold text-sm mb-1">🚨 활동 정지 상태입니다</p>
+                                        <p className="text-rose-400 text-xs">해제 예정일: {new Date(profile.suspended_until).toLocaleDateString()}</p>
+                                    </div>
+                                )}
 
                                 {/* Stats */}
                                 <div className="flex gap-4 text-center py-3 border-y border-[var(--border)]">

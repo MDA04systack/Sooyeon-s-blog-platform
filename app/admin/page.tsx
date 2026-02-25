@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import type { User } from '@supabase/supabase-js'
 import Navbar from '@/components/Navbar'
+import { sendSuspensionEmail } from '@/app/actions/sendEmail'
 
 type Tab = 'users' | 'posts' | 'categories' | 'settings'
 
@@ -66,8 +67,8 @@ export default function AdminPage() {
                             key={t}
                             onClick={() => setActiveTab(t)}
                             className={`px-5 py-2.5 text-sm font-medium rounded-lg transition-all ${activeTab === t
-                                    ? 'bg-indigo-500 text-white shadow-md'
-                                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
+                                ? 'bg-indigo-500 text-white shadow-md'
+                                : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
                                 }`}
                         >
                             {t === 'users' && '회원 관리'}
@@ -99,12 +100,24 @@ function UsersAdminTab({ supabase }: { supabase: any }) {
 
     useEffect(() => { loadUsers() }, [])
 
-    const handleSuspend = async (uid: string, days: number) => {
+    const handleSuspend = async (uid: string, days: number, email: string) => {
         if (!confirm(`${days}일 활동 정지를 부여하시겠습니까?`)) return
         const until = new Date()
         until.setDate(until.getDate() + days)
-        await supabase.from('profiles').update({ suspended_until: until.toISOString() }).eq('id', uid)
+        const untilString = until.toISOString()
+        await supabase.from('profiles').update({ suspended_until: untilString }).eq('id', uid)
+
+        // 이메일 발송 (비동기 처리로 UI block 최소화)
+        sendSuspensionEmail(email, days, untilString).catch(console.error)
+
         alert('처리되었습니다.')
+        loadUsers()
+    }
+
+    const handleUnsuspend = async (uid: string) => {
+        if (!confirm('해당 유저의 활동 정지를 즉시 해제하시겠습니까?')) return
+        await supabase.from('profiles').update({ suspended_until: null }).eq('id', uid)
+        alert('정지가 해제되었습니다.')
         loadUsers()
     }
 
@@ -144,8 +157,14 @@ function UsersAdminTab({ supabase }: { supabase: any }) {
                             <td className="px-4 py-4 text-right space-x-2">
                                 {u.role !== 'admin' && (
                                     <>
-                                        <button onClick={() => handleSuspend(u.id, 1)} className="px-3 py-1 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 rounded-md text-xs font-medium transition">1일 정지</button>
-                                        <button onClick={() => handleSuspend(u.id, 7)} className="px-3 py-1 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 rounded-md text-xs font-medium transition">7일 정지</button>
+                                        {u.suspended_until && new Date(u.suspended_until) > new Date() ? (
+                                            <button onClick={() => handleUnsuspend(u.id)} className="px-3 py-1 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 rounded-md text-xs font-medium transition">정지 해제</button>
+                                        ) : (
+                                            <>
+                                                <button onClick={() => handleSuspend(u.id, 1, u.email)} className="px-3 py-1 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 rounded-md text-xs font-medium transition">1일 정지</button>
+                                                <button onClick={() => handleSuspend(u.id, 7, u.email)} className="px-3 py-1 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 rounded-md text-xs font-medium transition">7일 정지</button>
+                                            </>
+                                        )}
                                         <button onClick={() => handleDelete(u.id)} className="px-3 py-1 bg-red-600 outline outline-1 outline-red-700 text-white hover:bg-red-500 rounded-md text-xs font-medium transition ml-4">강제 탈퇴</button>
                                     </>
                                 )}

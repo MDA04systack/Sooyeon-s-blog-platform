@@ -11,6 +11,7 @@ export default function Navbar() {
     const [user, setUser] = useState<User | null>(null)
     const [nickname, setNickname] = useState<string | null>(null)
     const [isAdmin, setIsAdmin] = useState(false)
+    const [suspendedUntil, setSuspendedUntil] = useState<string | null>(null)
     const [searchValue, setSearchValue] = useState('')
     const { theme, toggleTheme } = useTheme()
     const router = useRouter()
@@ -20,11 +21,12 @@ export default function Navbar() {
         const loadUser = async (uid: string) => {
             const { data: profile } = await supabase
                 .from('profiles')
-                .select('nickname, role')
+                .select('nickname, role, suspended_until')
                 .eq('id', uid)
                 .single()
             setNickname(profile?.nickname ?? null)
             setIsAdmin(profile?.role === 'admin')
+            setSuspendedUntil(profile?.suspended_until ?? null)
         }
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setUser(session?.user ?? null)
@@ -32,6 +34,7 @@ export default function Navbar() {
             else {
                 setNickname(null)
                 setIsAdmin(false)
+                setSuspendedUntil(null)
             }
         })
         supabase.auth.getUser().then(({ data: { user } }) => {
@@ -126,7 +129,16 @@ export default function Navbar() {
                                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                 새 글 작성
                             </Link>
-                            <span className="text-sm text-[var(--text-muted)] hidden sm:block truncate max-w-[140px]">{nickname ?? user.email}</span>
+                            <div className="hidden sm:flex flex-col items-end justify-center mr-1">
+                                <span className="text-sm text-[var(--text-primary)] font-medium truncate max-w-[120px]">
+                                    {nickname ?? user.email}
+                                </span>
+                                {suspendedUntil && new Date(suspendedUntil) > new Date() && (
+                                    <span className="text-[10px] font-bold text-rose-500 bg-rose-500/10 px-1.5 py-[1px] rounded-sm mt-0.5 tracking-tight">
+                                        활동 정지됨
+                                    </span>
+                                )}
+                            </div>
                             <button
                                 onClick={handleLogout}
                                 className="rounded-full px-4 py-1.5 text-sm font-medium text-[var(--text-body)] hover:text-[var(--text-primary)] ring-1 ring-[var(--border)] hover:ring-[var(--border-focus)] transition"
