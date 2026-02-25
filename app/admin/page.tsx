@@ -206,13 +206,21 @@ function PostsAdminTab({ supabase }: { supabase: any }) {
 
     const updateStatus = async (id: string, newStatus: string) => {
         if (!confirm(`게시글을 ${newStatus === 'private' ? '비공개' : '공개'} 처리하시겠습니까?`)) return
-        await supabase.from('posts').update({ status: newStatus }).eq('id', id)
+        const { error } = await supabase.rpc('admin_update_post_status', { target_post_id: id, new_status: newStatus })
+        if (error) {
+            alert('상태 변경 실패: ' + error.message)
+            return
+        }
         loadPosts()
     }
 
     const deletePost = async (id: string) => {
         if (!confirm('이 게시글을 영구 삭제하시겠습니까?')) return
-        await supabase.from('posts').delete().eq('id', id)
+        const { error } = await supabase.rpc('admin_delete_post', { target_post_id: id })
+        if (error) {
+            alert('삭제 실패: ' + error.message)
+            return
+        }
         loadPosts()
     }
 
