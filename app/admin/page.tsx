@@ -384,7 +384,7 @@ function SettingsAdminTab({ supabase }: { supabase: any }) {
             <div className="flex items-center justify-between p-5 bg-[var(--bg-primary)] border border-[var(--border)] rounded-xl">
                 <div>
                     <h3 className="font-semibold text-[var(--text-primary)]">회원가입 허용</h3>
-                    <p className="text-sm text-[var(--text-muted)] mt-1">이 기능을 끄면 누구나 진행할 수 있었던 신규 회원가입이 전면 차단됩니다. (로그인 창 탭 잠김)</p>
+                    <p className="text-sm text-[var(--text-muted)] mt-1">이 기능을 끄면 누구나 진행할 수 있었던 신규 회원가입이 전면 차단됩니다. (로그인 페이지의 '회원가입' 탭 잠김)</p>
                 </div>
 
                 <button
