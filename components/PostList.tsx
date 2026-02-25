@@ -9,6 +9,7 @@ const POSTS_PER_PAGE = 6
 
 export default function PostList() {
     const [posts, setPosts] = useState<Post[]>([])
+    const [featuredPosts, setFeaturedPosts] = useState<Post[]>([])
     const [categories, setCategories] = useState<Category[]>([])
     const [activeCategorySlug, setActiveCategorySlug] = useState('all')
     const [sortOption, setSortOption] = useState<'latest' | 'oldest' | 'popular'>('latest')
@@ -31,11 +32,28 @@ export default function PostList() {
         setLoading(true)
         const supabase = createClient()
 
+        // 1. Fetch featured posts (only on page 1 and 'all' category)
+        if (currentPage === 1 && categorySlug === 'all') {
+            const { data: fData } = await supabase
+                .from('posts')
+                .select('*, categories!inner(name, slug)')
+                .eq('status', 'published')
+                .eq('is_featured', true)
+                .order('published_at', { ascending: false })
+                .limit(3)
+
+            if (fData) setFeaturedPosts(fData as unknown as Post[])
+        } else if (currentPage === 1) {
+            setFeaturedPosts([])
+        }
+
+        // 2. Fetch normal posts
         // Use !inner to filter posts by the joined category table
         let query = supabase
             .from('posts')
             .select('*, categories!inner(name, slug)', { count: 'exact' })
             .eq('status', 'published')
+            .eq('is_featured', false) // Exclude featured from normal list to prevent duplication
             .range(0, currentPage * POSTS_PER_PAGE - 1)
 
         // Apply filtering
@@ -153,7 +171,29 @@ export default function PostList() {
                 </div>
             </div>
 
-            {/* Post Grid */}
+            {/* Featured Posts (Only visible on page 1 / 'all' category) */}
+            {featuredPosts.length > 0 && (
+                <div className="mb-12">
+                    <div className="flex items-center gap-2 mb-6">
+                        <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        <h2 className="text-xl font-bold tracking-tight">주목받는 게시글</h2>
+                    </div>
+                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        {featuredPosts.map((post) => (
+                            <div key={`featured-${post.id}`} className="relative group">
+                                <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-indigo-500 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-500"></div>
+                                <div className="relative h-full ring-1 ring-yellow-500/50 rounded-2xl overflow-hidden">
+                                    <PostCard post={post} />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Normal Post Grid */}
             {loading && posts.length === 0 ? (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {[...Array(6)].map((_, i) => (
