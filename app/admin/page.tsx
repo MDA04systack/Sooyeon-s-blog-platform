@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import type { User } from '@supabase/supabase-js'
 import Navbar from '@/components/Navbar'
-import { sendSuspensionEmail } from '@/app/actions/sendEmail'
+import { sendSuspensionEmail, sendUnsuspensionEmail } from '@/app/actions/sendEmail'
 
 type Tab = 'users' | 'posts' | 'categories' | 'settings'
 
@@ -119,7 +119,7 @@ function UsersAdminTab({ supabase }: { supabase: any }) {
         loadUsers()
     }
 
-    const handleUnsuspend = async (uid: string) => {
+    const handleUnsuspend = async (uid: string, email: string) => {
         if (!confirm('해당 유저의 활동 정지를 즉시 해제하시겠습니까?')) return
 
         const { error } = await supabase.rpc('admin_unsuspend_user', { target_uid: uid })
@@ -127,6 +127,9 @@ function UsersAdminTab({ supabase }: { supabase: any }) {
             alert('해제 실패: ' + error.message)
             return
         }
+
+        // 비동기 복구 안내 메일 발송
+        sendUnsuspensionEmail(email).catch(console.error)
 
         alert('정지가 해제되었습니다.')
         loadUsers()
@@ -169,7 +172,7 @@ function UsersAdminTab({ supabase }: { supabase: any }) {
                                 {u.role !== 'admin' && (
                                     <>
                                         {u.suspended_until && new Date(u.suspended_until) > new Date() ? (
-                                            <button onClick={() => handleUnsuspend(u.id)} className="px-3 py-1 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 rounded-md text-xs font-medium transition">정지 해제</button>
+                                            <button onClick={() => handleUnsuspend(u.id, u.email)} className="px-3 py-1 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 rounded-md text-xs font-medium transition">정지 해제</button>
                                         ) : (
                                             <>
                                                 <button onClick={() => handleSuspend(u.id, 1, u.email)} className="px-3 py-1 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 rounded-md text-xs font-medium transition">1일 정지</button>
