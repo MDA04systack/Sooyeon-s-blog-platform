@@ -198,7 +198,7 @@ function PostsAdminTab({ supabase }: { supabase: any }) {
     const [posts, setPosts] = useState<any[]>([])
 
     const loadPosts = async () => {
-        const { data } = await supabase.from('posts').select('id, title, status, author_name, created_at, slug').order('created_at', { ascending: false })
+        const { data } = await supabase.rpc('admin_get_all_posts')
         if (data) setPosts(data)
     }
 
