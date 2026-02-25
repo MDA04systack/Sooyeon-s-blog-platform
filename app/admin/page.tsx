@@ -105,7 +105,12 @@ function UsersAdminTab({ supabase }: { supabase: any }) {
         const until = new Date()
         until.setDate(until.getDate() + days)
         const untilString = until.toISOString()
-        await supabase.from('profiles').update({ suspended_until: untilString }).eq('id', uid)
+
+        const { error } = await supabase.rpc('admin_suspend_user', { target_uid: uid, until_timestamp: untilString })
+        if (error) {
+            alert('정지 실패: ' + error.message)
+            return
+        }
 
         // 이메일 발송 (비동기 처리로 UI block 최소화)
         sendSuspensionEmail(email, days, untilString).catch(console.error)
@@ -116,7 +121,13 @@ function UsersAdminTab({ supabase }: { supabase: any }) {
 
     const handleUnsuspend = async (uid: string) => {
         if (!confirm('해당 유저의 활동 정지를 즉시 해제하시겠습니까?')) return
-        await supabase.from('profiles').update({ suspended_until: null }).eq('id', uid)
+
+        const { error } = await supabase.rpc('admin_unsuspend_user', { target_uid: uid })
+        if (error) {
+            alert('해제 실패: ' + error.message)
+            return
+        }
+
         alert('정지가 해제되었습니다.')
         loadUsers()
     }
