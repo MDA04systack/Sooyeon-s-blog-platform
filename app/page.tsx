@@ -3,6 +3,8 @@ import HeroSection from '@/components/HeroSection'
 import PostList from '@/components/PostList'
 import Footer from '@/components/Footer'
 
+export const dynamic = 'force-dynamic'
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]">
