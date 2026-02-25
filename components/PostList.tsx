@@ -9,7 +9,6 @@ const POSTS_PER_PAGE = 6
 
 export default function PostList() {
     const [posts, setPosts] = useState<Post[]>([])
-    const [featuredPosts, setFeaturedPosts] = useState<Post[]>([])
     const [categories, setCategories] = useState<Category[]>([])
     const [activeCategorySlug, setActiveCategorySlug] = useState('all')
     const [sortOption, setSortOption] = useState<'latest' | 'oldest' | 'popular'>('latest')
@@ -32,28 +31,11 @@ export default function PostList() {
         setLoading(true)
         const supabase = createClient()
 
-        // 1. Fetch featured posts (only on page 1 and 'all' category)
-        if (currentPage === 1 && categorySlug === 'all') {
-            const { data: fData } = await supabase
-                .from('posts')
-                .select('*, categories!inner(name, slug)')
-                .eq('status', 'published')
-                .eq('is_featured', true)
-                .order('published_at', { ascending: false })
-                .limit(3)
-
-            if (fData) setFeaturedPosts(fData as unknown as Post[])
-        } else if (currentPage === 1) {
-            setFeaturedPosts([])
-        }
-
-        // 2. Fetch normal posts
         // Use !inner to filter posts by the joined category table
         let query = supabase
             .from('posts')
             .select('*, categories!inner(name, slug)', { count: 'exact' })
             .eq('status', 'published')
-            .eq('is_featured', false) // Exclude featured from normal list to prevent duplication
             .range(0, currentPage * POSTS_PER_PAGE - 1)
 
         // Apply filtering
@@ -171,14 +153,14 @@ export default function PostList() {
                 </div>
             </div>
 
-            {/* Unified Post Grid (Featured Posts first, then Normal Posts) */}
+            {/* Post Grid */}
             {loading && posts.length === 0 ? (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {[...Array(6)].map((_, i) => (
                         <div key={i} className="h-80 rounded-2xl bg-[var(--bg-card)] animate-pulse" />
                     ))}
                 </div>
-            ) : posts.length === 0 && featuredPosts.length === 0 ? (
+            ) : posts.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-24 text-[var(--text-muted)]">
                     <svg className="mb-4 h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -188,17 +170,6 @@ export default function PostList() {
                 </div>
             ) : (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {/* Featured Posts (Yellow highlighted ring) */}
-                    {featuredPosts.map((post) => (
-                        <div key={`featured-${post.id}`} className="relative group">
-                            <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-indigo-500 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-500"></div>
-                            <div className="relative h-full ring-1 ring-yellow-500/50 rounded-2xl overflow-hidden">
-                                <PostCard post={post} />
-                            </div>
-                        </div>
-                    ))}
-
-                    {/* Normal Posts */}
                     {posts.map((post) => (
                         <PostCard key={post.id} post={post} />
                     ))}
