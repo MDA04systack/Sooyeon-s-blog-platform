@@ -196,19 +196,56 @@ function UsersAdminTab({ supabase }: { supabase: any }) {
 
 function PostsAdminTab({ supabase }: { supabase: any }) {
     const [posts, setPosts] = useState<any[]>([])
+    const [originalPosts, setOriginalPosts] = useState<any[]>([])
+    const [isSaving, setIsSaving] = useState(false)
 
     const loadPosts = async () => {
         const { data } = await supabase.rpc('admin_get_all_posts')
-        if (data) setPosts(data)
+        if (data) {
+            setPosts(data)
+            setOriginalPosts(JSON.parse(JSON.stringify(data)))
+        }
     }
 
-    const toggleFeatured = async (id: string, currentStatus: boolean) => {
-        const { error } = await supabase.rpc('admin_toggle_post_feature', { target_post_id: id, make_featured: !currentStatus })
-        if (error) {
-            alert('상단 고정 설정 실패: ' + error.message)
+    const toggleFeatured = (id: string) => {
+        setPosts(prev => {
+            const currentCount = prev.filter(p => p.is_featured).length;
+            const post = prev.find(p => p.id === id);
+
+            if (!post?.is_featured && currentCount >= 3) {
+                alert('메인 상단 고정 게시물은 최대 3개까지만 설정할 수 있습니다.');
+                return prev;
+            }
+
+            return prev.map(p => p.id === id ? { ...p, is_featured: !p.is_featured } : p);
+        });
+    }
+
+    const saveFeaturedSettings = async () => {
+        setIsSaving(true)
+        const changedPosts = posts.filter(p => {
+            const orig = originalPosts.find(o => o.id === p.id)
+            return orig && orig.is_featured !== p.is_featured
+        })
+
+        if (changedPosts.length === 0) {
+            alert('변경된 설정이 없거나 이미 저장되었습니다.')
+            setIsSaving(false)
             return
         }
+
+        for (const post of changedPosts) {
+            const { error } = await supabase.rpc('admin_toggle_post_feature', { target_post_id: post.id, make_featured: post.is_featured })
+            if (error) {
+                alert('상단 고정 설정 실패: ' + error.message)
+                setIsSaving(false)
+                return
+            }
+        }
+
+        alert('게시물 상단 고정 설정이 안전하게 저장되었습니다.')
         loadPosts()
+        setIsSaving(false)
     }
 
     useEffect(() => { loadPosts() }, [])
@@ -234,56 +271,79 @@ function PostsAdminTab({ supabase }: { supabase: any }) {
     }
 
     return (
-        <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm whitespace-nowrap">
-                <thead className="bg-[var(--bg-hover)] text-[var(--text-muted)] uppercase">
-                    <tr>
-                        <th className="px-4 py-3 rounded-l-lg">제목</th>
-                        <th className="px-4 py-3">작성자</th>
-                        <th className="px-4 py-3">작성일</th>
-                        <th className="px-4 py-3">상태</th>
-                        <th className="px-4 py-3 rounded-r-lg text-right">관리</th>
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-[var(--border)]">
-                    {posts.map(p => (
-                        <tr key={p.id} className="hover:bg-[var(--bg-hover)]">
-                            <td className="px-4 py-4 font-medium max-w-xs truncate" title={p.title}>
-                                <a href={`/posts/${p.slug}`} target="_blank" className="hover:underline">{p.title}</a>
-                            </td>
-                            <td className="px-4 py-4">{p.author_name}</td>
-                            <td className="px-4 py-4 text-[var(--text-muted)]">{new Date(p.created_at).toLocaleDateString()}</td>
-                            <td className="px-4 py-4">
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={() => toggleFeatured(p.id, p.is_featured)}
-                                        className={`p-1.5 rounded-md transition-colors ${p.is_featured ? 'text-yellow-500 hover:bg-yellow-500/10' : 'text-[var(--text-faint)] hover:text-yellow-500 hover:bg-[var(--bg-hover)]'}`}
-                                        title={p.is_featured ? '상단 고정 해제' : '상단 고정 설정 (최대 3개)'}
-                                    >
-                                        <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill={p.is_featured ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={p.is_featured ? 0 : 2}>
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                                        </svg>
-                                    </button>
-                                    <span className={`px-2 py-1 rounded-md text-xs font-bold ${p.status === 'published' ? 'bg-emerald-500/10 text-emerald-400' : p.status === 'private' ? 'bg-amber-500/10 text-amber-500' : 'bg-slate-500/10 text-slate-400'}`}>
-                                        {p.status}
-                                    </span>
-                                </div>
-                            </td>
-                            <td className="px-4 py-4 text-right space-x-2">
-                                {p.status === 'published' ? (
-                                    <button onClick={() => updateStatus(p.id, 'private')} className="px-3 py-1 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 rounded-md text-xs font-medium transition">비공개 처리</button>
-                                ) : (
-                                    <button onClick={() => updateStatus(p.id, 'published')} className="px-3 py-1 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 rounded-md text-xs font-medium transition">공개 처리</button>
-                                )}
-                                <button onClick={() => deletePost(p.id)} className="px-3 py-1 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-md text-xs font-medium transition ml-2">삭제</button>
-                            </td>
-                        </tr>
-                    ))}
-                    {posts.length === 0 && (
-                        <tr><td colSpan={5} className="px-4 py-8 text-center text-[var(--text-muted)]">게시글이 없습니다.</td></tr>
+        <div className="space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-4 bg-[var(--bg-hover)] p-4 rounded-xl border border-[var(--border)]">
+                <div className="flex max-w-lg items-start gap-3 text-sm text-[var(--text-muted)]">
+                    <svg className="mt-0.5 h-5 w-5 shrink-0 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p>별 모양(★)을 클릭하여 상단 고정할 게시물을 선택하세요. 변경 후 반드시 우측의 <strong>"게시물 설정 저장"</strong> 버튼을 눌러야 실제 메인 화면에 반영됩니다. (최대 3개)</p>
+                </div>
+                <button
+                    onClick={saveFeaturedSettings}
+                    disabled={isSaving}
+                    className="shrink-0 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg text-sm transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                    {isSaving ? (
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    ) : (
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
                     )}
-                </tbody>
-            </table>
+                    게시물 설정 저장
+                </button>
+            </div>
+
+            <div className="overflow-x-auto ring-1 ring-[var(--border)] rounded-xl">
+                <table className="w-full text-left text-sm whitespace-nowrap">
+                    <thead className="bg-[var(--bg-hover)] text-[var(--text-muted)] uppercase">
+                        <tr>
+                            <th className="px-4 py-3 rounded-l-lg">제목</th>
+                            <th className="px-4 py-3">작성자</th>
+                            <th className="px-4 py-3">작성일</th>
+                            <th className="px-4 py-3">상태</th>
+                            <th className="px-4 py-3 rounded-r-lg text-right">관리</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[var(--border)]">
+                        {posts.map(p => (
+                            <tr key={p.id} className="hover:bg-[var(--bg-hover)]">
+                                <td className="px-4 py-4 font-medium max-w-xs truncate" title={p.title}>
+                                    <a href={`/posts/${p.slug}`} target="_blank" className="hover:underline">{p.title}</a>
+                                </td>
+                                <td className="px-4 py-4">{p.author_name}</td>
+                                <td className="px-4 py-4 text-[var(--text-muted)]">{new Date(p.created_at).toLocaleDateString()}</td>
+                                <td className="px-4 py-4">
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => toggleFeatured(p.id)}
+                                            className={`p-1.5 rounded-md transition-colors ${p.is_featured ? 'text-yellow-500 hover:bg-yellow-500/10' : 'text-[var(--text-faint)] hover:text-yellow-500 hover:bg-[var(--bg-hover)]'}`}
+                                            title={p.is_featured ? '상단 고정 해제' : '상단 고정 설정 (최대 3개)'}
+                                        >
+                                            <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill={p.is_featured ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={p.is_featured ? 0 : 2}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                            </svg>
+                                        </button>
+                                        <span className={`px-2 py-1 rounded-md text-xs font-bold ${p.status === 'published' ? 'bg-emerald-500/10 text-emerald-400' : p.status === 'private' ? 'bg-amber-500/10 text-amber-500' : 'bg-slate-500/10 text-slate-400'}`}>
+                                            {p.status}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td className="px-4 py-4 text-right space-x-2">
+                                    {p.status === 'published' ? (
+                                        <button onClick={() => updateStatus(p.id, 'private')} className="px-3 py-1 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 rounded-md text-xs font-medium transition">비공개 처리</button>
+                                    ) : (
+                                        <button onClick={() => updateStatus(p.id, 'published')} className="px-3 py-1 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 rounded-md text-xs font-medium transition">공개 처리</button>
+                                    )}
+                                    <button onClick={() => deletePost(p.id)} className="px-3 py-1 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-md text-xs font-medium transition ml-2">삭제</button>
+                                </td>
+                            </tr>
+                        ))}
+                        {posts.length === 0 && (
+                            <tr><td colSpan={5} className="px-4 py-8 text-center text-[var(--text-muted)]">게시글이 없습니다.</td></tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
         </div>
     )
 }
