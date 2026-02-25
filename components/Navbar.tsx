@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/client'
 import { useTheme } from '@/components/ThemeProvider'
@@ -11,6 +12,7 @@ export default function Navbar() {
     const [nickname, setNickname] = useState<string | null>(null)
     const [searchValue, setSearchValue] = useState('')
     const { theme, toggleTheme } = useTheme()
+    const router = useRouter()
     const supabase = createClient()
 
     useEffect(() => {
@@ -54,14 +56,28 @@ export default function Navbar() {
 
                 {/* Search Bar */}
                 <div className="relative flex-1 max-w-md">
-                    <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-                    </svg>
+                    <button
+                        onClick={() => {
+                            if (searchValue.trim()) {
+                                router.push(`/search?q=${encodeURIComponent(searchValue.trim())}`)
+                            }
+                        }}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-indigo-400 transition"
+                    >
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+                        </svg>
+                    </button>
                     <input
                         type="text"
                         placeholder="검색어를 입력하세요..."
                         value={searchValue}
                         onChange={(e) => setSearchValue(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && searchValue.trim()) {
+                                router.push(`/search?q=${encodeURIComponent(searchValue.trim())}`)
+                            }
+                        }}
                         className="w-full rounded-full bg-[var(--bg-input)] py-2 pl-9 pr-4 text-sm text-[var(--text-body)] placeholder-[var(--text-faint)] outline-none ring-1 ring-[var(--border)] transition focus:ring-indigo-500/60"
                     />
                 </div>

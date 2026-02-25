@@ -108,20 +108,6 @@ export const MarkdownComponents: Components = {
 export default function PostContent({ post }: { post: Post }) {
     return (
         <article className="mx-auto max-w-3xl px-6 pb-24">
-            {/* Thumbnail Image */}
-            {post.thumbnail_url && (
-                <div className="relative mb-12 mt-4 aspect-[21/9] w-full overflow-hidden rounded-2xl bg-[var(--bg-card)] ring-1 ring-[var(--border)]">
-                    <Image
-                        src={post.thumbnail_url}
-                        alt={post.title}
-                        fill
-                        className="object-cover"
-                        priority
-                        unoptimized
-                    />
-                </div>
-            )}
-
             {/* Markdown Content */}
             <div className="prose dark:prose-invert max-w-none text-base">
                 <ReactMarkdown

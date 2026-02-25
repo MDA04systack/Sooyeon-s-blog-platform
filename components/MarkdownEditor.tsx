@@ -74,6 +74,10 @@ export default function MarkdownEditor({ user }: MarkdownEditorProps) {
             .eq('id', user.id)
             .single()
 
+        // Extract first image URL from content
+        const firstImageMatch = content.match(/!\[.*?\]\((.*?)\)/)
+        const extractedThumbnail = firstImageMatch ? firstImageMatch[1] : null
+
         const postData = {
             title: title || '제목 없는 문서',
             slug: `${slug}-${Date.now().toString().slice(-4)}`, // ensure uniqueness
@@ -82,7 +86,7 @@ export default function MarkdownEditor({ user }: MarkdownEditorProps) {
             author_name: profile?.nickname || user?.user_metadata?.name || user?.email?.split('@')[0] || 'Unknown User',
             user_id: user.id, // Add user_id for RLS policies!
             category_id: selectedCategoryId || null,
-            thumbnail_url: null,
+            thumbnail_url: extractedThumbnail,
             published_at: new Date().toISOString(),
             is_featured: false,
             view_count: 0

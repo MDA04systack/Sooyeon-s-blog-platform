@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/client'
@@ -36,7 +36,21 @@ export default function LoginPage() {
     const [usernameChecked, setUsernameChecked] = useState(false)
     const [nicknameChecked, setNicknameChecked] = useState(false)
 
+    // Fetch site settings for signup block
+    const [signupEnabled, setSignupEnabled] = useState(true)
+    useEffect(() => {
+        const loadSettings = async () => {
+            const { data } = await supabase.from('site_settings').select('signup_enabled').eq('id', 1).single()
+            if (data && data.signup_enabled === false) setSignupEnabled(false)
+        }
+        loadSettings()
+    }, [supabase])
+
     const switchMode = (m: Mode) => {
+        if (m === 'signup' && !signupEnabled) {
+            setError('현재 관리자에 의해 신규 회원가입이 제한되어 있습니다.')
+            return
+        }
         setMode(m)
         setError(null)
         setUsernameStatus('idle')
@@ -178,7 +192,7 @@ export default function LoginPage() {
                             className={`flex-1 pb-3 text-sm font-semibold transition-colors ${mode === m
                                 ? 'text-indigo-400 border-b-2 border-indigo-400'
                                 : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                                }`}
+                                } ${m === 'signup' && !signupEnabled ? 'opacity-40 cursor-not-allowed' : ''}`}
                         >
                             {m === 'login' ? '로그인' : '회원가입'}
                         </button>

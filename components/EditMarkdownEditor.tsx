@@ -56,6 +56,10 @@ export default function EditMarkdownEditor({ user, post }: EditMarkdownEditorPro
         setIsSaving(true)
         const supabase = createClient()
 
+        // Extract first image URL from content
+        const firstImageMatch = content.match(/!\[.*?\]\((.*?)\)/)
+        const extractedThumbnail = firstImageMatch ? firstImageMatch[1] : null
+
         const { error } = await supabase
             .from('posts')
             .update({
@@ -63,6 +67,7 @@ export default function EditMarkdownEditor({ user, post }: EditMarkdownEditorPro
                 content,
                 status: saveStatus,
                 category_id: selectedCategoryId || null,
+                thumbnail_url: extractedThumbnail,
             })
             .eq('id', post.id)
 
