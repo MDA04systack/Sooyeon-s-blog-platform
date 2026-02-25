@@ -198,6 +198,7 @@ function PostsAdminTab({ supabase }: { supabase: any }) {
     const [posts, setPosts] = useState<any[]>([])
     const [originalPosts, setOriginalPosts] = useState<any[]>([])
     const [isSaving, setIsSaving] = useState(false)
+    const router = useRouter()
 
     const loadPosts = async () => {
         const { data } = await supabase.rpc('admin_get_all_posts')
@@ -244,8 +245,9 @@ function PostsAdminTab({ supabase }: { supabase: any }) {
         }
 
         alert('게시물 상단 고정 설정이 안전하게 저장되었습니다.')
-        loadPosts()
+        await loadPosts()
         setIsSaving(false)
+        router.refresh() // 강제로 서버 컴포넌트 데이터 갱신 유도
     }
 
     useEffect(() => { loadPosts() }, [])
