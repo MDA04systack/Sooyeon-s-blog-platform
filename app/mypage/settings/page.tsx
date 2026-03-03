@@ -24,6 +24,8 @@ export default function AccountSettingsPage() {
     const [email, setEmail] = useState('')
     const [loading, setLoading] = useState(false)
     const [uploading, setUploading] = useState(false)
+    const [selectedFile, setSelectedFile] = useState<File | null>(null)
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null)
     const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
 
     // Nickname change
@@ -134,9 +136,24 @@ export default function AccountSettingsPage() {
 
     // ─── Account deletion ─────────────────────────────────────
     // ─── Profile Image Upload ──────────────────────────────────
-    async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
         if (!e.target.files || e.target.files.length === 0) return
         const file = e.target.files[0]
+
+        // Limit file size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            showMsg('파일 크기가 너무 큽니다. (최대 5MB)', 'error')
+            return
+        }
+
+        setSelectedFile(file)
+        const objectUrl = URL.createObjectURL(file)
+        setPreviewUrl(objectUrl)
+    }
+
+    async function handleSaveAvatar() {
+        if (!selectedFile) return
+        const file = selectedFile
         const fileExt = file.name.split('.').pop()
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
@@ -150,7 +167,12 @@ export default function AccountSettingsPage() {
                 .from('avatars')
                 .upload(filePath, file)
 
-            if (uploadError) throw uploadError
+            if (uploadError) {
+                if (uploadError.message.includes('Bucket not found')) {
+                    throw new Error('스토리지 버킷(avatars)이 존재하지 않습니다. 관리자에게 문의하거나 마이그레이션을 실행해주세요.')
+                }
+                throw uploadError
+            }
 
             const { data: { publicUrl } } = supabase.storage
                 .from('avatars')
@@ -164,12 +186,19 @@ export default function AccountSettingsPage() {
             if (updateError) throw updateError
 
             setProfile(p => p ? { ...p, avatar_url: publicUrl } : p)
+            setSelectedFile(null)
+            setPreviewUrl(null)
             showMsg('프로필 사진이 업데이트되었습니다.', 'success')
         } catch (error: any) {
             showMsg(`업로드 실패: ${error.message}`, 'error')
         } finally {
             setUploading(false)
         }
+    }
+
+    function handleCancelSelect() {
+        setSelectedFile(null)
+        setPreviewUrl(null)
     }
 
     async function handleRemoveAvatar() {
@@ -257,9 +286,9 @@ export default function AccountSettingsPage() {
                     <h2 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-4">프로필 사진</h2>
                     <div className="flex items-center gap-6">
                         <div className="relative group">
-                            {profile?.avatar_url ? (
+                            {previewUrl || profile?.avatar_url ? (
                                 <div className="h-24 w-24 rounded-full overflow-hidden ring-4 ring-teal-500/10 transition-all group-hover:ring-teal-500/20">
-                                    <img src={profile.avatar_url} alt="Profile" className="h-full w-full object-cover" />
+                                    <img src={previewUrl || profile?.avatar_url || ''} alt="Profile" className="h-full w-full object-cover" />
                                 </div>
                             ) : (
                                 <div className="h-24 w-24 rounded-full bg-[var(--bg-input)] flex items-center justify-center text-3xl font-bold text-[var(--text-primary)] ring-4 ring-teal-500/10">
@@ -268,13 +297,27 @@ export default function AccountSettingsPage() {
                             )}
                         </div>
                         <div className="flex flex-col gap-2">
-                            <label className="cursor-pointer px-4 py-2 rounded-lg bg-teal-500 hover:bg-teal-400 text-white text-sm font-medium transition-colors text-center disabled:opacity-60">
-                                {uploading ? '업로드 중...' : '이미지 업로드'}
-                                <input type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} disabled={uploading} />
-                            </label>
-                            {profile?.avatar_url && (
+                            <div className="flex gap-2">
+                                <label className="cursor-pointer px-4 py-2 rounded-lg bg-teal-500 hover:bg-teal-400 text-white text-sm font-medium transition-colors text-center disabled:opacity-60">
+                                    이미지 선택
+                                    <input type="file" className="hidden" accept="image/*" onChange={handleFileSelect} disabled={uploading} />
+                                </label>
+                                {previewUrl && (
+                                    <>
+                                        <button onClick={handleSaveAvatar} disabled={uploading}
+                                            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium transition-colors disabled:opacity-60">
+                                            {uploading ? '저장 중...' : '저장하기'}
+                                        </button>
+                                        <button onClick={handleCancelSelect} disabled={uploading}
+                                            className="px-4 py-2 rounded-lg border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] text-sm font-medium transition-colors disabled:opacity-60">
+                                            취소
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                            {!previewUrl && profile?.avatar_url && (
                                 <button onClick={handleRemoveAvatar} disabled={loading}
-                                    className="px-4 py-2 rounded-lg border border-[var(--border)] text-red-400 hover:bg-red-500/10 text-sm font-medium transition-colors disabled:opacity-60">
+                                    className="px-4 py-2 rounded-lg border border-[var(--border)] text-red-400 hover:bg-red-500/10 text-sm font-medium transition-colors disabled:opacity-60 text-left">
                                     이미지 삭제
                                 </button>
                             )}
