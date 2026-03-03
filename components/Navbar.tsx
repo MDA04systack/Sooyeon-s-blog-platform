@@ -79,7 +79,7 @@ export default function Navbar() {
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2 shrink-0">
                     <div className="flex items-center justify-center">
-                        <Image src="/logo_only.png" alt="BioLogic.dev Logo" width={40} height={40} className="object-contain" />
+                        <Image src="/logo.png" alt="BioLogic.dev Logo" width={40} height={40} className="object-contain" />
                     </div>
                     <span className="text-xl font-bold tracking-tight -ml-1">
                         <span className="text-[var(--text-primary)]">BioLogic</span>

@@ -8,7 +8,7 @@ export default function Footer() {
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2">
                     <div className="flex items-center justify-center">
-                        <Image src="/logo_only.png" alt="BioLogic.dev Logo" width={28} height={28} className="object-contain" />
+                        <Image src="/logo.png" alt="BioLogic.dev Logo" width={28} height={28} className="object-contain" />
                     </div>
                     <span className="text-lg font-bold tracking-tight -ml-0.5">
                         <span className="text-[var(--text-primary)]">BioLogic</span>
