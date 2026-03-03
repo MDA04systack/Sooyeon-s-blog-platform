@@ -268,162 +268,171 @@ export default function AccountSettingsPage() {
         )
     }
 
-    // ─── Settings Screen ──────────────────────────────────────
-    return (
-        <div className="min-h-screen bg-[var(--bg-primary)] py-12 px-4">
-            <div className="max-w-xl mx-auto space-y-6">
+    <div className="min-h-screen bg-[var(--bg-primary)] py-12 px-4">
+        <div className="max-w-xl mx-auto space-y-6">
+            <div className="flex items-center gap-4">
+                <button
+                    onClick={() => router.push('/mypage')}
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] transition-all shadow-sm group"
+                    title="마이 페이지로 돌아가기"
+                >
+                    <svg className="h-5 w-5 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
                 <h1 className="text-2xl font-bold text-[var(--text-primary)]">계정 설정</h1>
+            </div>
 
-                {message && (
-                    <div className={`p-3 text-sm rounded-lg border ${message.type === 'success'
-                        ? 'text-green-400 bg-green-900/20 border-green-800'
-                        : 'text-red-400 bg-red-900/20 border-red-800'
-                        }`}>{message.text}</div>
-                )}
+            {message && (
+                <div className={`p-3 text-sm rounded-lg border ${message.type === 'success'
+                    ? 'text-green-400 bg-green-900/20 border-green-800'
+                    : 'text-red-400 bg-red-900/20 border-red-800'
+                    }`}>{message.text}</div>
+            )}
 
-                {/* Profile Image */}
-                <div className={sectionCls}>
-                    <h2 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-4">프로필 사진</h2>
-                    <div className="flex items-center gap-6">
-                        <div className="relative group">
-                            {previewUrl || profile?.avatar_url ? (
-                                <div className="h-24 w-24 rounded-full overflow-hidden ring-4 ring-teal-500/10 transition-all group-hover:ring-teal-500/20">
-                                    <img src={previewUrl || profile?.avatar_url || ''} alt="Profile" className="h-full w-full object-cover" />
-                                </div>
-                            ) : (
-                                <div className="h-24 w-24 rounded-full bg-[var(--bg-input)] flex items-center justify-center text-3xl font-bold text-[var(--text-primary)] ring-4 ring-teal-500/10">
-                                    {(profile?.nickname || 'U').slice(0, 1).toUpperCase()}
-                                </div>
-                            )}
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <div className="flex gap-2">
-                                <label className="cursor-pointer px-4 py-2 rounded-lg bg-teal-500 hover:bg-teal-400 text-white text-sm font-medium transition-colors text-center disabled:opacity-60">
-                                    이미지 선택
-                                    <input type="file" className="hidden" accept="image/*" onChange={handleFileSelect} disabled={uploading} />
-                                </label>
-                                {previewUrl && (
-                                    <>
-                                        <button onClick={handleSaveAvatar} disabled={uploading}
-                                            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium transition-colors disabled:opacity-60">
-                                            {uploading ? '저장 중...' : '저장하기'}
-                                        </button>
-                                        <button onClick={handleCancelSelect} disabled={uploading}
-                                            className="px-4 py-2 rounded-lg border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] text-sm font-medium transition-colors disabled:opacity-60">
-                                            취소
-                                        </button>
-                                    </>
-                                )}
+            {/* Profile Image */}
+            <div className={sectionCls}>
+                <h2 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-4">프로필 사진</h2>
+                <div className="flex items-center gap-6">
+                    <div className="relative group">
+                        {previewUrl || profile?.avatar_url ? (
+                            <div className="h-24 w-24 rounded-full overflow-hidden ring-4 ring-teal-500/10 transition-all group-hover:ring-teal-500/20">
+                                <img src={previewUrl || profile?.avatar_url || ''} alt="Profile" className="h-full w-full object-cover" />
                             </div>
-                            {!previewUrl && profile?.avatar_url && (
-                                <button onClick={handleRemoveAvatar} disabled={loading}
-                                    className="px-4 py-2 rounded-lg border border-[var(--border)] text-red-400 hover:bg-red-500/10 text-sm font-medium transition-colors disabled:opacity-60 text-left">
-                                    이미지 삭제
-                                </button>
-                            )}
-                            <p className="text-[10px] text-[var(--text-faint)]">JPG, PNG, WEBP (최대 5MB)</p>
-                        </div>
+                        ) : (
+                            <div className="h-24 w-24 rounded-full bg-[var(--bg-input)] flex items-center justify-center text-3xl font-bold text-[var(--text-primary)] ring-4 ring-teal-500/10">
+                                {(profile?.nickname || 'U').slice(0, 1).toUpperCase()}
+                            </div>
+                        )}
                     </div>
-                </div>
-
-                {/* Current info */}
-                {profile && (
-                    <div className={sectionCls}>
-                        <h2 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-3">현재 정보</h2>
-                        <div className="grid grid-cols-2 gap-3 text-sm">
-                            <div><span className="text-[var(--text-faint)]">아이디</span><p className="font-medium text-[var(--text-primary)] mt-0.5">{profile.username}</p></div>
-                            <div><span className="text-[var(--text-faint)]">닉네임</span><p className="font-medium text-[var(--text-primary)] mt-0.5">{profile.nickname}</p></div>
-                            <div><span className="text-[var(--text-faint)]">이메일</span><p className="font-medium text-[var(--text-primary)] mt-0.5">{email}</p></div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Nickname change */}
-                <div className={sectionCls}>
-                    <h2 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-4">닉네임 변경</h2>
-                    <form onSubmit={handleNicknameChange} className="space-y-3">
-                        <div>
-                            <label className={labelCls} htmlFor="newNickname">
-                                새 닉네임 <DupBadge status={nicknameStatus} />
+                    <div className="flex flex-col gap-2">
+                        <div className="flex gap-2">
+                            <label className="cursor-pointer px-4 py-2 rounded-lg bg-teal-500 hover:bg-teal-400 text-white text-sm font-medium transition-colors text-center disabled:opacity-60">
+                                이미지 선택
+                                <input type="file" className="hidden" accept="image/*" onChange={handleFileSelect} disabled={uploading} />
                             </label>
-                            <div className="flex gap-2">
-                                <input id="newNickname" type="text" required value={newNickname}
-                                    onChange={e => onNicknameInput(e.target.value)}
-                                    className={inputCls} placeholder="새 닉네임 입력" />
-                                <button type="button" onClick={checkNickname}
-                                    className="shrink-0 px-3 py-2 text-xs rounded-lg bg-teal-600 hover:bg-teal-500 text-white transition-colors">
-                                    중복확인
-                                </button>
-                            </div>
+                            {previewUrl && (
+                                <>
+                                    <button onClick={handleSaveAvatar} disabled={uploading}
+                                        className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium transition-colors disabled:opacity-60">
+                                        {uploading ? '저장 중...' : '저장하기'}
+                                    </button>
+                                    <button onClick={handleCancelSelect} disabled={uploading}
+                                        className="px-4 py-2 rounded-lg border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] text-sm font-medium transition-colors disabled:opacity-60">
+                                        취소
+                                    </button>
+                                </>
+                            )}
                         </div>
-                        <button type="submit" disabled={loading}
-                            className="px-4 py-2 rounded-lg bg-teal-500 hover:bg-teal-400 text-white text-sm font-medium transition-colors disabled:opacity-60">
-                            닉네임 변경
-                        </button>
-                    </form>
-                </div>
-
-                {/* Email change */}
-                <div className={sectionCls}>
-                    <h2 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1">이메일 변경</h2>
-                    <p className="text-xs text-[var(--text-muted)] mb-4">
-                        변경 요청 후 <strong>새 이메일</strong>로 발송된 확인 링크를 클릭하면 변경이 완료됩니다.
-                    </p>
-                    <form onSubmit={handleEmailChange} className="space-y-3">
-                        <div>
-                            <label className={labelCls} htmlFor="newEmail">새 이메일 주소</label>
-                            <input id="newEmail" type="email" required value={newEmail}
-                                onChange={e => setNewEmail(e.target.value)}
-                                className={inputCls} placeholder="new@example.com" />
-                        </div>
-                        <button type="submit" disabled={loading}
-                            className="px-4 py-2 rounded-lg bg-teal-500 hover:bg-teal-400 text-white text-sm font-medium transition-colors disabled:opacity-60">
-                            {loading ? '전송 중...' : '이메일 변경 요청'}
-                        </button>
-                    </form>
-                </div>
-
-                {/* Password reset */}
-                <div className={sectionCls}>
-                    <h2 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">비밀번호 변경</h2>
-                    <p className="text-xs text-[var(--text-muted)] mb-4">현재 이메일({email})로 비밀번호 재설정 링크를 전송합니다.</p>
-                    <button onClick={handlePasswordReset} disabled={loading}
-                        className="px-4 py-2 rounded-lg border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] text-sm font-medium transition-colors disabled:opacity-60">
-                        재설정 링크 보내기
-                    </button>
-                </div>
-
-                {/* Account deletion */}
-                <div className={`${sectionCls} border-red-900/50`}>
-                    <h2 className="text-sm font-semibold text-red-400 uppercase tracking-wide mb-2">회원 탈퇴</h2>
-                    <p className="text-xs text-[var(--text-muted)] mb-4">탈퇴 시 모든 게시글, 댓글, 북마크 데이터가 영구 삭제됩니다.</p>
-                    <button onClick={() => setShowDeleteModal(true)}
-                        className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-medium transition-colors">
-                        회원 탈퇴
-                    </button>
+                        {!previewUrl && profile?.avatar_url && (
+                            <button onClick={handleRemoveAvatar} disabled={loading}
+                                className="px-4 py-2 rounded-lg border border-[var(--border)] text-red-400 hover:bg-red-500/10 text-sm font-medium transition-colors disabled:opacity-60 text-left">
+                                이미지 삭제
+                            </button>
+                        )}
+                        <p className="text-[10px] text-[var(--text-faint)]">JPG, PNG, WEBP (최대 5MB)</p>
+                    </div>
                 </div>
             </div>
 
-            {/* Delete confirmation modal */}
-            {showDeleteModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-                    <div className="w-full max-w-sm p-6 bg-[var(--bg-card)] rounded-2xl border border-red-800">
-                        <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">정말 탈퇴하시겠습니까?</h3>
-                        <p className="text-sm text-[var(--text-muted)] mb-6">이 작업은 되돌릴 수 없습니다. 모든 데이터가 영구적으로 삭제됩니다.</p>
-                        <div className="flex gap-3">
-                            <button onClick={() => setShowDeleteModal(false)}
-                                className="flex-1 py-2 rounded-lg border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] text-sm font-medium transition-colors">
-                                취소
-                            </button>
-                            <button onClick={handleDeleteAccount} disabled={loading}
-                                className="flex-1 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-medium transition-colors disabled:opacity-60">
-                                {loading ? '처리 중...' : '탈퇴 확인'}
-                            </button>
-                        </div>
+            {/* Current info */}
+            {profile && (
+                <div className={sectionCls}>
+                    <h2 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-3">현재 정보</h2>
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div><span className="text-[var(--text-faint)]">아이디</span><p className="font-medium text-[var(--text-primary)] mt-0.5">{profile.username}</p></div>
+                        <div><span className="text-[var(--text-faint)]">닉네임</span><p className="font-medium text-[var(--text-primary)] mt-0.5">{profile.nickname}</p></div>
+                        <div><span className="text-[var(--text-faint)]">이메일</span><p className="font-medium text-[var(--text-primary)] mt-0.5">{email}</p></div>
                     </div>
                 </div>
             )}
+
+            {/* Nickname change */}
+            <div className={sectionCls}>
+                <h2 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-4">닉네임 변경</h2>
+                <form onSubmit={handleNicknameChange} className="space-y-3">
+                    <div>
+                        <label className={labelCls} htmlFor="newNickname">
+                            새 닉네임 <DupBadge status={nicknameStatus} />
+                        </label>
+                        <div className="flex gap-2">
+                            <input id="newNickname" type="text" required value={newNickname}
+                                onChange={e => onNicknameInput(e.target.value)}
+                                className={inputCls} placeholder="새 닉네임 입력" />
+                            <button type="button" onClick={checkNickname}
+                                className="shrink-0 px-3 py-2 text-xs rounded-lg bg-teal-600 hover:bg-teal-500 text-white transition-colors">
+                                중복확인
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" disabled={loading}
+                        className="px-4 py-2 rounded-lg bg-teal-500 hover:bg-teal-400 text-white text-sm font-medium transition-colors disabled:opacity-60">
+                        닉네임 변경
+                    </button>
+                </form>
+            </div>
+
+            {/* Email change */}
+            <div className={sectionCls}>
+                <h2 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1">이메일 변경</h2>
+                <p className="text-xs text-[var(--text-muted)] mb-4">
+                    변경 요청 후 <strong>새 이메일</strong>로 발송된 확인 링크를 클릭하면 변경이 완료됩니다.
+                </p>
+                <form onSubmit={handleEmailChange} className="space-y-3">
+                    <div>
+                        <label className={labelCls} htmlFor="newEmail">새 이메일 주소</label>
+                        <input id="newEmail" type="email" required value={newEmail}
+                            onChange={e => setNewEmail(e.target.value)}
+                            className={inputCls} placeholder="new@example.com" />
+                    </div>
+                    <button type="submit" disabled={loading}
+                        className="px-4 py-2 rounded-lg bg-teal-500 hover:bg-teal-400 text-white text-sm font-medium transition-colors disabled:opacity-60">
+                        {loading ? '전송 중...' : '이메일 변경 요청'}
+                    </button>
+                </form>
+            </div>
+
+            {/* Password reset */}
+            <div className={sectionCls}>
+                <h2 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">비밀번호 변경</h2>
+                <p className="text-xs text-[var(--text-muted)] mb-4">현재 이메일({email})로 비밀번호 재설정 링크를 전송합니다.</p>
+                <button onClick={handlePasswordReset} disabled={loading}
+                    className="px-4 py-2 rounded-lg border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] text-sm font-medium transition-colors disabled:opacity-60">
+                    재설정 링크 보내기
+                </button>
+            </div>
+
+            {/* Account deletion */}
+            <div className={`${sectionCls} border-red-900/50`}>
+                <h2 className="text-sm font-semibold text-red-400 uppercase tracking-wide mb-2">회원 탈퇴</h2>
+                <p className="text-xs text-[var(--text-muted)] mb-4">탈퇴 시 모든 게시글, 댓글, 북마크 데이터가 영구 삭제됩니다.</p>
+                <button onClick={() => setShowDeleteModal(true)}
+                    className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-medium transition-colors">
+                    회원 탈퇴
+                </button>
+            </div>
         </div>
+
+        {/* Delete confirmation modal */}
+        {showDeleteModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+                <div className="w-full max-w-sm p-6 bg-[var(--bg-card)] rounded-2xl border border-red-800">
+                    <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">정말 탈퇴하시겠습니까?</h3>
+                    <p className="text-sm text-[var(--text-muted)] mb-6">이 작업은 되돌릴 수 없습니다. 모든 데이터가 영구적으로 삭제됩니다.</p>
+                    <div className="flex gap-3">
+                        <button onClick={() => setShowDeleteModal(false)}
+                            className="flex-1 py-2 rounded-lg border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] text-sm font-medium transition-colors">
+                            취소
+                        </button>
+                        <button onClick={handleDeleteAccount} disabled={loading}
+                            className="flex-1 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-medium transition-colors disabled:opacity-60">
+                            {loading ? '처리 중...' : '탈퇴 확인'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
+    </div>
     )
 }
 
