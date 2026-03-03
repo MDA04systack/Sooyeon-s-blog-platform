@@ -11,7 +11,7 @@ interface Comment {
     updated_at: string
     user_id: string
     parent_id: string | null
-    profiles: { nickname: string } | null
+    profiles: { nickname: string; avatar_url: string | null } | null
 }
 
 interface PostCommentsProps {
@@ -86,9 +86,19 @@ function CommentItem({
             <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                        <div className="h-6 w-6 rounded-full bg-[var(--bg-input)] flex items-center justify-center text-[var(--text-primary)] text-[10px] font-bold shrink-0">
-                            {(comment.profiles?.nickname ?? 'A').slice(0, 1).toUpperCase()}
-                        </div>
+                        {comment.profiles?.avatar_url ? (
+                            <div className="h-7 w-7 rounded-full overflow-hidden ring-1 ring-teal-500/20 shrink-0">
+                                <img
+                                    src={comment.profiles.avatar_url}
+                                    alt={comment.profiles.nickname || 'User'}
+                                    className="h-full w-full object-cover"
+                                />
+                            </div>
+                        ) : (
+                            <div className="h-7 w-7 rounded-full bg-[var(--bg-input)] flex items-center justify-center text-[var(--text-primary)] text-[10px] font-bold shrink-0 border border-[var(--border)]">
+                                {(comment.profiles?.nickname ?? 'A').slice(0, 1).toUpperCase()}
+                            </div>
+                        )}
                         <span className="text-sm font-semibold text-[var(--text-primary)]">
                             {comment.profiles?.nickname ?? '알 수 없음'}
                         </span>
@@ -213,14 +223,14 @@ export default function PostComments({ postId }: PostCommentsProps) {
 
         const userIds = [...new Set(commentsData.map(c => c.user_id))]
         const { data: profilesData } = await supabase
-            .from('profiles').select('id, nickname').in('id', userIds)
+            .from('profiles').select('id, nickname, avatar_url').in('id', userIds)
 
-        const profileMap: Record<string, string> = {}
-        for (const p of profilesData || []) profileMap[p.id] = p.nickname
+        const profileMap: Record<string, { nickname: string; avatar_url: string | null }> = {}
+        for (const p of profilesData || []) profileMap[p.id] = { nickname: p.nickname, avatar_url: p.avatar_url }
 
         setComments(commentsData.map(c => ({
             ...c,
-            profiles: profileMap[c.user_id] ? { nickname: profileMap[c.user_id] } : null,
+            profiles: profileMap[c.user_id] || null,
         })))
         setLoading(false)
     }

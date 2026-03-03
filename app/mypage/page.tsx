@@ -18,7 +18,7 @@ export default async function MyPostsPage() {
     // Fetch profile (nickname, username, suspended_until)
     const { data: profile } = await supabase
         .from('profiles')
-        .select('username, nickname, full_name, suspended_until')
+        .select('username, nickname, full_name, suspended_until, avatar_url')
         .eq('id', user.id)
         .single()
 
@@ -73,11 +73,21 @@ export default async function MyPostsPage() {
                             {/* Profile Card */}
                             <div className="p-5 bg-[var(--bg-card)] rounded-2xl border border-[var(--border)]">
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className="h-12 w-12 rounded-full bg-teal-500/20 flex items-center justify-center shrink-0">
-                                        <span className="text-lg font-bold text-teal-400">
-                                            {(profile?.nickname ?? user.email ?? '?')[0].toUpperCase()}
-                                        </span>
-                                    </div>
+                                    {profile?.avatar_url ? (
+                                        <div className="relative h-12 w-12 overflow-hidden rounded-full ring-2 ring-teal-500/20 shrink-0">
+                                            <img
+                                                src={profile.avatar_url}
+                                                alt={profile.nickname || 'User'}
+                                                className="h-full w-full object-cover"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="h-12 w-12 rounded-full bg-teal-500/10 border border-teal-500/20 flex items-center justify-center shrink-0">
+                                            <span className="text-lg font-bold text-teal-400">
+                                                {(profile?.nickname ?? user.email ?? '?')[0].toUpperCase()}
+                                            </span>
+                                        </div>
+                                    )}
                                     <div className="min-w-0">
                                         <p className="font-semibold text-[var(--text-primary)] truncate">
                                             {profile?.nickname ?? '닉네임 없음'}
