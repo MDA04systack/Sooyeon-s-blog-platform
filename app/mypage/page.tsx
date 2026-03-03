@@ -73,8 +73,8 @@ export default async function MyPostsPage() {
                             {/* Profile Card */}
                             <div className="p-5 bg-[var(--bg-card)] rounded-2xl border border-[var(--border)]">
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className="h-12 w-12 rounded-full bg-indigo-500/20 flex items-center justify-center shrink-0">
-                                        <span className="text-lg font-bold text-indigo-400">
+                                    <div className="h-12 w-12 rounded-full bg-teal-500/20 flex items-center justify-center shrink-0">
+                                        <span className="text-lg font-bold text-teal-400">
                                             {(profile?.nickname ?? user.email ?? '?')[0].toUpperCase()}
                                         </span>
                                     </div>
@@ -111,7 +111,7 @@ export default async function MyPostsPage() {
                             {/* Navigation */}
                             <nav className="flex flex-col gap-1.5">
                                 <Link href="/write"
-                                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium bg-indigo-500 text-white hover:bg-indigo-400 transition-colors">
+                                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium bg-teal-500 text-white hover:bg-teal-400 transition-colors">
                                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                                     </svg>

@@ -124,7 +124,7 @@ export default function PostHeader({
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-white/10 pb-8">
                 <div className="flex items-center gap-3">
                     {post.author_avatar_url ? (
-                        <div className="relative h-10 w-10 overflow-hidden rounded-full ring-2 ring-indigo-500/30">
+                        <div className="relative h-10 w-10 overflow-hidden rounded-full ring-2 ring-teal-500/30">
                             <Image
                                 src={post.author_avatar_url}
                                 alt={post.author_name}
@@ -134,8 +134,8 @@ export default function PostHeader({
                             />
                         </div>
                     ) : (
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg-card)] ring-2 ring-indigo-500/30">
-                            <span className="text-sm font-bold text-white uppercase">{post.author_name.slice(0, 2)}</span>
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg-card)] ring-2 ring-teal-500/30">
+                            <span className="text-sm font-bold text-[var(--text-primary)] uppercase">{post.author_name.slice(0, 2)}</span>
                         </div>
                     )}
 
@@ -185,7 +185,7 @@ export default function PostHeader({
                                 <>
                                     <Link
                                         href={`/posts/${postSlug}/edit`}
-                                        className="flex h-9 w-9 items-center justify-center rounded-full text-[var(--text-muted)] hover:bg-[var(--bg-input)] hover:text-indigo-400 transition"
+                                        className="flex h-9 w-9 items-center justify-center rounded-full text-[var(--text-muted)] hover:bg-[var(--bg-input)] hover:text-teal-400 transition"
                                         title="수정하기"
                                     >
                                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -212,7 +212,7 @@ export default function PostHeader({
                         onClick={handleBookmark}
                         disabled={isLiking}
                         className={`flex h-9 w-9 items-center justify-center rounded-full transition ${isBookmarked
-                            ? 'text-indigo-500 bg-indigo-500/10 hover:bg-indigo-500/20'
+                            ? 'text-teal-500 bg-teal-500/10 hover:bg-teal-500/20'
                             : 'text-[var(--text-muted)] hover:bg-[var(--bg-input)] hover:text-[var(--text-primary)]'
                             }`}
                         aria-label={isBookmarked ? "북마크 해제" : "북마크 저장"}

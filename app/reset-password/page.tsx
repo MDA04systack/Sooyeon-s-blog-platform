@@ -29,7 +29,7 @@ export default function ResetPasswordPage() {
         }
     }
 
-    const inputCls = "w-full px-4 py-2.5 bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder:text-[var(--text-faint)]"
+    const inputCls = "w-full px-4 py-2.5 bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all placeholder:text-[var(--text-faint)]"
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-[var(--bg-primary)] px-4">
@@ -69,12 +69,12 @@ export default function ResetPasswordPage() {
                         </div>
 
                         <button type="submit" disabled={loading}
-                            className="w-full py-3 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white font-medium text-sm transition-colors disabled:opacity-60">
+                            className="w-full py-3 rounded-lg bg-teal-500 hover:bg-teal-400 text-white font-medium text-sm transition-colors disabled:opacity-60">
                             {loading ? '전송 중...' : '비밀번호 재설정 링크 보내기'}
                         </button>
 
                         <Link href="/login"
-                            className="block text-center text-sm text-[var(--text-muted)] hover:text-indigo-400 transition-colors">
+                            className="block text-center text-sm text-[var(--text-muted)] hover:text-teal-400 transition-colors">
                             ← 로그인으로 돌아가기
                         </Link>
                     </form>

@@ -68,7 +68,7 @@ export default function AdminPage() {
                             key={t}
                             onClick={() => setActiveTab(t)}
                             className={`px-5 py-2.5 text-sm font-medium rounded-lg transition-all ${activeTab === t
-                                ? 'bg-indigo-500 text-white shadow-md'
+                                ? 'bg-teal-500 text-white shadow-md'
                                 : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
                                 }`}
                         >
@@ -165,7 +165,7 @@ function UsersAdminTab({ supabase }: { supabase: any }) {
                             <td className="px-4 py-4">{u.email}</td>
                             <td className="px-4 py-4 text-[var(--text-muted)]">{new Date(u.created_at).toLocaleDateString()}</td>
                             <td className="px-4 py-4">
-                                {u.role === 'admin' ? <span className="px-2 py-1 bg-indigo-500/10 text-indigo-400 rounded-md text-xs font-bold">Admin</span>
+                                {u.role === 'admin' ? <span className="px-2 py-1 bg-teal-500/10 text-teal-400 rounded-md text-xs font-bold">Admin</span>
                                     : u.suspended_until && new Date(u.suspended_until) > new Date() ? <span className="px-2 py-1 bg-rose-500/10 text-rose-400 rounded-md text-xs font-bold">정지됨(~{new Date(u.suspended_until).toLocaleDateString()})</span>
                                         : <span className="px-2 py-1 bg-emerald-500/10 text-emerald-400 rounded-md text-xs font-bold">정상</span>}
                             </td>
@@ -288,7 +288,7 @@ function PostsAdminTab({ supabase }: { supabase: any }) {
                 <button
                     onClick={saveFeaturedSettings}
                     disabled={isSaving}
-                    className="shrink-0 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg text-sm transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="shrink-0 px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg text-sm transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                     {isSaving ? (
                         <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -395,9 +395,9 @@ function CategoriesAdminTab({ supabase }: { supabase: any }) {
             <div className="bg-[var(--bg-primary)] p-5 rounded-xl border border-[var(--border)] max-w-xl">
                 <h3 className="font-bold mb-4">새 카테고리 추가</h3>
                 <div className="flex gap-3">
-                    <input type="text" placeholder="이름 (예: 프론트엔드)" value={newCatName} onChange={(e) => setNewCatName(e.target.value)} className="flex-1 px-3 py-2 bg-[var(--bg-input)] border border-[var(--border)] rounded-md text-sm outline-none focus:ring-1 focus:ring-indigo-500" />
-                    <input type="text" placeholder="슬러그 (예: frontend)" value={newCatSlug} onChange={(e) => setNewCatSlug(e.target.value)} className="w-32 px-3 py-2 bg-[var(--bg-input)] border border-[var(--border)] rounded-md text-sm outline-none focus:ring-1 focus:ring-indigo-500" />
-                    <button onClick={handleCreate} className="px-4 py-2 bg-indigo-500 text-white rounded-md text-sm font-medium hover:bg-indigo-400 transition">추가</button>
+                    <input type="text" placeholder="이름 (예: 프론트엔드)" value={newCatName} onChange={(e) => setNewCatName(e.target.value)} className="flex-1 px-3 py-2 bg-[var(--bg-input)] border border-[var(--border)] rounded-md text-sm outline-none focus:ring-1 focus:ring-teal-500" />
+                    <input type="text" placeholder="슬러그 (예: frontend)" value={newCatSlug} onChange={(e) => setNewCatSlug(e.target.value)} className="w-32 px-3 py-2 bg-[var(--bg-input)] border border-[var(--border)] rounded-md text-sm outline-none focus:ring-1 focus:ring-teal-500" />
+                    <button onClick={handleCreate} className="px-4 py-2 bg-teal-500 text-white rounded-md text-sm font-medium hover:bg-teal-400 transition">추가</button>
                 </div>
             </div>
 
@@ -430,7 +430,7 @@ function CategoriesAdminTab({ supabase }: { supabase: any }) {
                                         </>
                                     ) : (
                                         <>
-                                            <button onClick={() => { setEditingId(c.id); setEditName(c.name) }} className="px-3 py-1 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 rounded-md text-xs font-medium transition">이름 수정</button>
+                                            <button onClick={() => { setEditingId(c.id); setEditName(c.name) }} className="px-3 py-1 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 rounded-md text-xs font-medium transition">이름 수정</button>
                                             <button onClick={() => handleDelete(c.id, c.name)} className="px-3 py-1 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-md text-xs font-medium transition">삭제</button>
                                         </>
                                     )}
@@ -475,7 +475,7 @@ function SettingsAdminTab({ supabase }: { supabase: any }) {
 
                 <button
                     onClick={toggleSignup}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${signupEnabled ? 'bg-indigo-500' : 'bg-slate-500'}`}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${signupEnabled ? 'bg-teal-500' : 'bg-slate-500'}`}
                 >
                     <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${signupEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
                 </button>

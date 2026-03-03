@@ -148,7 +148,7 @@ export default function MyPageClient({ myPosts: initialMyPosts, bookmarkedPosts:
                     >
                         {tab.label}
                         <span className="ml-2 rounded-full bg-[var(--bg-input)] px-2 py-0.5 text-xs text-[var(--text-muted)]">{tab.count}</span>
-                        {activeMainTab === tab.id && <div className="absolute -bottom-[1px] left-0 h-0.5 w-full bg-indigo-500" />}
+                        {activeMainTab === tab.id && <div className="absolute -bottom-[1px] left-0 h-0.5 w-full bg-teal-500" />}
                     </button>
                 ))}
             </div>
@@ -161,7 +161,7 @@ export default function MyPageClient({ myPosts: initialMyPosts, bookmarkedPosts:
                             <button key={tab.id} onClick={() => setActiveSubTab(tab.id)}
                                 className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition ${activeSubTab === tab.id ? 'bg-[var(--bg-input)] text-[var(--text-primary)] shadow-sm ring-1 ring-[var(--border)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}>
                                 {tab.label}
-                                <span className={`rounded-full px-1.5 py-0.5 text-xs font-semibold ${activeSubTab === tab.id ? 'bg-indigo-500 text-white' : 'bg-[var(--bg-input)] text-[var(--text-muted)]'}`}>
+                                <span className={`rounded-full px-1.5 py-0.5 text-xs font-semibold ${activeSubTab === tab.id ? 'bg-teal-500 text-white' : 'bg-[var(--bg-input)] text-[var(--text-muted)]'}`}>
                                     {myPostCounts[tab.id]}
                                 </span>
                             </button>
@@ -171,7 +171,7 @@ export default function MyPageClient({ myPosts: initialMyPosts, bookmarkedPosts:
                     {displayedMyPosts.length === 0 ? (
                         <div className="flex flex-col items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] py-20 text-center">
                             <p className="text-[var(--text-muted)] mb-4">해당하는 글이 없습니다.</p>
-                            <Link href="/write" className="rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-400 transition">새 글 작성하기</Link>
+                            <Link href="/write" className="rounded-lg bg-teal-500 px-4 py-2 text-sm font-medium text-white hover:bg-teal-400 transition">새 글 작성하기</Link>
                         </div>
                     ) : (
                         <div className="flex flex-col gap-4">
@@ -188,7 +188,7 @@ export default function MyPageClient({ myPosts: initialMyPosts, bookmarkedPosts:
                                                 <span className="text-xs text-[var(--text-faint)]">{new Date(post.published_at).toLocaleDateString()}</span>
                                             </div>
                                             <Link href={post.status === 'draft' ? `/posts/${post.slug}/edit` : `/posts/${post.slug}`}
-                                                className="block text-lg font-bold text-[var(--text-primary)] hover:text-indigo-500 transition truncate">
+                                                className="block text-lg font-bold text-[var(--text-primary)] hover:text-teal-500 transition truncate">
                                                 {post.title || '제목 없음'}
                                             </Link>
                                         </div>
@@ -228,13 +228,13 @@ export default function MyPageClient({ myPosts: initialMyPosts, bookmarkedPosts:
                                 <div key={post.id} className="group flex flex-col sm:flex-row sm:items-center gap-4 py-4 border-b border-[var(--border)] last:border-0 hover:bg-[var(--bg-card-hover)] transition rounded-lg px-2">
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-3 mb-1">
-                                            {post.categories && <span className="text-xs font-medium text-indigo-400">{post.categories.name}</span>}
+                                            {post.categories && <span className="text-xs font-medium text-teal-400">{post.categories.name}</span>}
                                             <span className="text-xs text-[var(--text-faint)]">{new Date(post.published_at).toLocaleDateString()}</span>
                                         </div>
-                                        <Link href={`/posts/${post.slug}`} className="block text-lg font-bold text-[var(--text-primary)] hover:text-indigo-500 transition truncate">{post.title}</Link>
+                                        <Link href={`/posts/${post.slug}`} className="block text-lg font-bold text-[var(--text-primary)] hover:text-teal-500 transition truncate">{post.title}</Link>
                                     </div>
                                     <div className="flex shrink-0 items-center justify-end gap-2">
-                                        <Link href={`/posts/${post.slug}`} className="rounded-lg px-4 py-2 text-sm font-medium bg-[var(--bg-input)] text-[var(--text-primary)] hover:bg-indigo-500 hover:text-white transition">읽기</Link>
+                                        <Link href={`/posts/${post.slug}`} className="rounded-lg px-4 py-2 text-sm font-medium bg-[var(--bg-input)] text-[var(--text-primary)] hover:bg-teal-500 hover:text-white transition">읽기</Link>
                                         <button onClick={() => handleRemoveBookmark(post.id)} className="rounded-lg p-2 text-[var(--text-muted)] hover:bg-red-500/10 hover:text-red-500 transition" title="북마크 해제">
                                             <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24"><path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
                                         </button>
@@ -265,7 +265,7 @@ export default function MyPageClient({ myPosts: initialMyPosts, bookmarkedPosts:
                                         type="checkbox"
                                         checked={allSelected}
                                         onChange={toggleSelectAll}
-                                        className="h-4 w-4 rounded accent-indigo-500"
+                                        className="h-4 w-4 rounded accent-teal-500"
                                     />
                                     <span className="text-sm text-[var(--text-muted)]">전체 선택</span>
                                 </label>
@@ -299,7 +299,7 @@ export default function MyPageClient({ myPosts: initialMyPosts, bookmarkedPosts:
                                                 type="checkbox"
                                                 checked={selectedIds.has(comment.id)}
                                                 onChange={() => toggleSelect(comment.id)}
-                                                className="h-4 w-4 rounded accent-indigo-500"
+                                                className="h-4 w-4 rounded accent-teal-500"
                                             />
                                         </div>
 
@@ -310,7 +310,7 @@ export default function MyPageClient({ myPosts: initialMyPosts, bookmarkedPosts:
                                                 {comment.posts ? (
                                                     <Link
                                                         href={`/posts/${comment.posts.slug}#comments`}
-                                                        className="text-xs font-medium text-indigo-400 hover:text-indigo-300 hover:underline truncate max-w-[280px]"
+                                                        className="text-xs font-medium text-teal-400 hover:text-teal-300 hover:underline truncate max-w-[280px]"
                                                     >
                                                         📄 {comment.posts.title}
                                                     </Link>
@@ -330,12 +330,12 @@ export default function MyPageClient({ myPosts: initialMyPosts, bookmarkedPosts:
                                                         rows={2}
                                                         value={editCommentText}
                                                         onChange={e => setEditCommentText(e.target.value)}
-                                                        className="w-full px-3 py-2 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/60 resize-none"
+                                                        className="w-full px-3 py-2 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-teal-500/60 resize-none"
                                                         autoFocus
                                                     />
                                                     <div className="flex gap-2">
                                                         <button onClick={() => saveEditComment(comment.id)}
-                                                            className="px-3 py-1 text-xs rounded-md bg-indigo-500 hover:bg-indigo-400 text-white transition">저장</button>
+                                                            className="px-3 py-1 text-xs rounded-md bg-teal-500 hover:bg-teal-400 text-white transition">저장</button>
                                                         <button onClick={() => setEditingCommentId(null)}
                                                             className="px-3 py-1 text-xs rounded-md border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--bg-input)] transition">취소</button>
                                                     </div>

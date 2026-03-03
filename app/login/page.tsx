@@ -7,7 +7,7 @@ import { createClient } from '@/utils/supabase/client'
 
 type Mode = 'login' | 'signup'
 
-const inputCls = "w-full px-4 py-2.5 bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder:text-[var(--text-faint)]"
+const inputCls = "w-full px-4 py-2.5 bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all placeholder:text-[var(--text-faint)]"
 const labelCls = "block text-sm font-medium text-[var(--text-body)] mb-1"
 
 export default function LoginPage() {
@@ -190,7 +190,7 @@ export default function LoginPage() {
                             key={m}
                             onClick={() => switchMode(m)}
                             className={`flex-1 pb-3 text-sm font-semibold transition-colors ${mode === m
-                                ? 'text-indigo-400 border-b-2 border-indigo-400'
+                                ? 'text-teal-400 border-b-2 border-teal-400'
                                 : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                                 } ${m === 'signup' && !signupEnabled ? 'opacity-40 cursor-not-allowed' : ''}`}
                         >
@@ -223,12 +223,12 @@ export default function LoginPage() {
 
                         {/* Find ID / Find Password links */}
                         <div className="flex justify-between text-xs text-[var(--text-muted)]">
-                            <Link href="/find-id" className="hover:text-indigo-400 transition-colors">아이디 찾기</Link>
-                            <Link href="/reset-password" className="hover:text-indigo-400 transition-colors">비밀번호 찾기</Link>
+                            <Link href="/find-id" className="hover:text-teal-400 transition-colors">아이디 찾기</Link>
+                            <Link href="/reset-password" className="hover:text-teal-400 transition-colors">비밀번호 찾기</Link>
                         </div>
 
                         <button type="submit" disabled={loading}
-                            className="w-full py-3 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white font-medium text-sm transition-colors disabled:opacity-60">
+                            className="w-full py-3 rounded-lg bg-teal-500 hover:bg-teal-400 text-white font-medium text-sm transition-colors disabled:opacity-60">
                             {loading ? '로그인 중...' : '로그인'}
                         </button>
 
@@ -258,7 +258,7 @@ export default function LoginPage() {
                                     onChange={e => onUsernameChange(e.target.value)}
                                     className={inputCls} placeholder="영문·숫자 (소문자)" />
                                 <button type="button" onClick={checkUsername}
-                                    className="shrink-0 px-3 py-2 text-xs rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors">
+                                    className="shrink-0 px-3 py-2 text-xs rounded-lg bg-teal-600 hover:bg-teal-500 text-white transition-colors">
                                     중복확인
                                 </button>
                             </div>
@@ -274,7 +274,7 @@ export default function LoginPage() {
                                     onChange={e => onNicknameChange(e.target.value)}
                                     className={inputCls} placeholder="게시글에 표시될 이름" />
                                 <button type="button" onClick={checkNickname}
-                                    className="shrink-0 px-3 py-2 text-xs rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors">
+                                    className="shrink-0 px-3 py-2 text-xs rounded-lg bg-teal-600 hover:bg-teal-500 text-white transition-colors">
                                     중복확인
                                 </button>
                             </div>
@@ -309,7 +309,7 @@ export default function LoginPage() {
                         </div>
 
                         <button type="submit" disabled={loading}
-                            className="w-full py-3 mt-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white font-medium text-sm transition-colors disabled:opacity-60">
+                            className="w-full py-3 mt-2 rounded-lg bg-teal-500 hover:bg-teal-400 text-white font-medium text-sm transition-colors disabled:opacity-60">
                             {loading ? '처리 중...' : '회원가입'}
                         </button>
                     </form>

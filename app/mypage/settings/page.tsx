@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 
-const inputCls = "w-full px-4 py-2.5 bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder:text-[var(--text-faint)]"
+const inputCls = "w-full px-4 py-2.5 bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all placeholder:text-[var(--text-faint)]"
 const labelCls = "block text-sm font-medium text-[var(--text-body)] mb-1"
 const sectionCls = "p-5 bg-[var(--bg-card)] rounded-xl border border-[var(--border)]"
 
-type Profile = { username: string; nickname: string; full_name: string | null }
+type Profile = { username: string; nickname: string; full_name: string | null; avatar_url: string | null }
 
 export default function AccountSettingsPage() {
     const supabase = createClient()
@@ -23,6 +23,7 @@ export default function AccountSettingsPage() {
     const [profile, setProfile] = useState<Profile | null>(null)
     const [email, setEmail] = useState('')
     const [loading, setLoading] = useState(false)
+    const [uploading, setUploading] = useState(false)
     const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
 
     // Nickname change
@@ -43,7 +44,15 @@ export default function AccountSettingsPage() {
                 const { data: { user } } = await supabase.auth.getUser()
                 if (!user) { router.push('/login'); return }
                 setEmail(user.email ?? '')
-                const { data: p } = await supabase.from('profiles').select('username, nickname, full_name').eq('id', user.id).single()
+
+                let { data: p, error } = await supabase.from('profiles').select('username, nickname, full_name, avatar_url').eq('id', user.id).single()
+
+                if (error) {
+                    console.warn('Profile fetch with avatar_url failed, retrying without it:', error.message)
+                    const { data: retryP } = await supabase.from('profiles').select('username, nickname, full_name').eq('id', user.id).single()
+                    p = retryP as any
+                }
+
                 if (p) { setProfile(p); setNewNickname(p.nickname) }
             })()
     }, [verified])
@@ -124,6 +133,67 @@ export default function AccountSettingsPage() {
     }
 
     // ─── Account deletion ─────────────────────────────────────
+    // ─── Profile Image Upload ──────────────────────────────────
+    async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+        if (!e.target.files || e.target.files.length === 0) return
+        const file = e.target.files[0]
+        const fileExt = file.name.split('.').pop()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+
+        setUploading(true)
+        try {
+            const fileName = `${user.id}/${Date.now()}.${fileExt}`
+            const filePath = `${fileName}`
+
+            const { error: uploadError } = await supabase.storage
+                .from('avatars')
+                .upload(filePath, file)
+
+            if (uploadError) throw uploadError
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('avatars')
+                .getPublicUrl(filePath)
+
+            const { error: updateError } = await supabase
+                .from('profiles')
+                .update({ avatar_url: publicUrl })
+                .eq('id', user.id)
+
+            if (updateError) throw updateError
+
+            setProfile(p => p ? { ...p, avatar_url: publicUrl } : p)
+            showMsg('프로필 사진이 업데이트되었습니다.', 'success')
+        } catch (error: any) {
+            showMsg(`업로드 실패: ${error.message}`, 'error')
+        } finally {
+            setUploading(false)
+        }
+    }
+
+    async function handleRemoveAvatar() {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user || !profile?.avatar_url) return
+
+        setLoading(true)
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ avatar_url: null })
+                .eq('id', user.id)
+
+            if (error) throw error
+
+            setProfile(p => p ? { ...p, avatar_url: null } : p)
+            showMsg('프로필 사진이 삭제되었습니다.', 'success')
+        } catch (error: any) {
+            showMsg(`삭제 실패: ${error.message}`, 'error')
+        } finally {
+            setLoading(false)
+        }
+    }
+
     async function handleDeleteAccount() {
         setLoading(true)
         const { error } = await supabase.rpc('delete_user_account')
@@ -160,7 +230,7 @@ export default function AccountSettingsPage() {
                                 className={inputCls} placeholder="••••••••" />
                         </div>
                         <button type="submit" disabled={gateLoading}
-                            className="w-full py-3 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white font-medium text-sm transition-colors disabled:opacity-60">
+                            className="w-full py-3 rounded-lg bg-teal-500 hover:bg-teal-400 text-white font-medium text-sm transition-colors disabled:opacity-60">
                             {gateLoading ? '확인 중...' : '계정 설정 열기'}
                         </button>
                     </form>
@@ -181,6 +251,37 @@ export default function AccountSettingsPage() {
                         : 'text-red-400 bg-red-900/20 border-red-800'
                         }`}>{message.text}</div>
                 )}
+
+                {/* Profile Image */}
+                <div className={sectionCls}>
+                    <h2 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-4">프로필 사진</h2>
+                    <div className="flex items-center gap-6">
+                        <div className="relative group">
+                            {profile?.avatar_url ? (
+                                <div className="h-24 w-24 rounded-full overflow-hidden ring-4 ring-teal-500/10 transition-all group-hover:ring-teal-500/20">
+                                    <img src={profile.avatar_url} alt="Profile" className="h-full w-full object-cover" />
+                                </div>
+                            ) : (
+                                <div className="h-24 w-24 rounded-full bg-[var(--bg-input)] flex items-center justify-center text-3xl font-bold text-[var(--text-primary)] ring-4 ring-teal-500/10">
+                                    {(profile?.nickname || 'U').slice(0, 1).toUpperCase()}
+                                </div>
+                            )}
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <label className="cursor-pointer px-4 py-2 rounded-lg bg-teal-500 hover:bg-teal-400 text-white text-sm font-medium transition-colors text-center disabled:opacity-60">
+                                {uploading ? '업로드 중...' : '이미지 업로드'}
+                                <input type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} disabled={uploading} />
+                            </label>
+                            {profile?.avatar_url && (
+                                <button onClick={handleRemoveAvatar} disabled={loading}
+                                    className="px-4 py-2 rounded-lg border border-[var(--border)] text-red-400 hover:bg-red-500/10 text-sm font-medium transition-colors disabled:opacity-60">
+                                    이미지 삭제
+                                </button>
+                            )}
+                            <p className="text-[10px] text-[var(--text-faint)]">JPG, PNG, WEBP (최대 5MB)</p>
+                        </div>
+                    </div>
+                </div>
 
                 {/* Current info */}
                 {profile && (
@@ -207,13 +308,13 @@ export default function AccountSettingsPage() {
                                     onChange={e => onNicknameInput(e.target.value)}
                                     className={inputCls} placeholder="새 닉네임 입력" />
                                 <button type="button" onClick={checkNickname}
-                                    className="shrink-0 px-3 py-2 text-xs rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors">
+                                    className="shrink-0 px-3 py-2 text-xs rounded-lg bg-teal-600 hover:bg-teal-500 text-white transition-colors">
                                     중복확인
                                 </button>
                             </div>
                         </div>
                         <button type="submit" disabled={loading}
-                            className="px-4 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-medium transition-colors disabled:opacity-60">
+                            className="px-4 py-2 rounded-lg bg-teal-500 hover:bg-teal-400 text-white text-sm font-medium transition-colors disabled:opacity-60">
                             닉네임 변경
                         </button>
                     </form>
@@ -233,7 +334,7 @@ export default function AccountSettingsPage() {
                                 className={inputCls} placeholder="new@example.com" />
                         </div>
                         <button type="submit" disabled={loading}
-                            className="px-4 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-medium transition-colors disabled:opacity-60">
+                            className="px-4 py-2 rounded-lg bg-teal-500 hover:bg-teal-400 text-white text-sm font-medium transition-colors disabled:opacity-60">
                             {loading ? '전송 중...' : '이메일 변경 요청'}
                         </button>
                     </form>

@@ -23,9 +23,9 @@ export default async function FindIdResultPage() {
                 <p className="text-sm text-[var(--text-muted)] mb-8">이메일로 인증된 회원님의 아이디입니다.</p>
 
                 {profile ? (
-                    <div className="p-5 bg-indigo-500/10 border border-indigo-500/30 rounded-xl mb-8">
+                    <div className="p-5 bg-teal-500/10 border border-teal-500/30 rounded-xl mb-8">
                         <p className="text-sm text-[var(--text-muted)] mb-1">회원님의 아이디</p>
-                        <p className="text-3xl font-bold text-indigo-400 tracking-wide">{profile.username}</p>
+                        <p className="text-3xl font-bold text-teal-400 tracking-wide">{profile.username}</p>
                     </div>
                 ) : (
                     <div className="p-4 text-sm text-red-400 bg-red-900/20 border border-red-800 rounded-lg mb-8">
@@ -34,7 +34,7 @@ export default async function FindIdResultPage() {
                 )}
 
                 <Link href="/login"
-                    className="block w-full py-3 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white font-medium text-sm transition-colors">
+                    className="block w-full py-3 rounded-lg bg-teal-500 hover:bg-teal-400 text-white font-medium text-sm transition-colors">
                     로그인하러 가기
                 </Link>
             </div>

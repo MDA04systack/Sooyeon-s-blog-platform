@@ -138,7 +138,7 @@ export default function EditMarkdownEditor({ user, post }: EditMarkdownEditorPro
             <header className="flex h-14 shrink-0 items-center justify-between border-b border-slate-800 px-4">
                 <div className="flex items-center gap-4">
                     <Link href={`/posts/${post.slug}`} className="flex items-center gap-2 group">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400 group-hover:bg-indigo-500/20 transition">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-500/10 text-teal-400 group-hover:bg-teal-500/20 transition">
                             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                             </svg>
@@ -168,7 +168,7 @@ export default function EditMarkdownEditor({ user, post }: EditMarkdownEditorPro
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                             </svg>
                         )}
-                        저장
+                        임시저장
                     </button>
 
                     {/* Status/Publish menu */}
@@ -176,7 +176,7 @@ export default function EditMarkdownEditor({ user, post }: EditMarkdownEditorPro
                         <button
                             onClick={() => setShowStatusMenu(!showStatusMenu)}
                             disabled={isSaving}
-                            className="flex items-center gap-2 rounded-lg bg-indigo-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-indigo-600 transition disabled:opacity-50"
+                            className="flex items-center gap-2 rounded-lg bg-teal-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-teal-600 transition disabled:opacity-50"
                         >
                             상태 변경
                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -256,7 +256,7 @@ export default function EditMarkdownEditor({ user, post }: EditMarkdownEditorPro
                 </div>
                 <div className="flex items-center gap-2 text-xs text-slate-500">
                     {isUploading ? (
-                        <span className="text-indigo-400 animate-pulse">업로드 중...</span>
+                        <span className="text-teal-400 animate-pulse">업로드 중...</span>
                     ) : (
                         <>
                             <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4V5H9z" /></svg>
@@ -274,7 +274,7 @@ export default function EditMarkdownEditor({ user, post }: EditMarkdownEditorPro
                         <select
                             value={selectedCategoryId}
                             onChange={(e) => setSelectedCategoryId(e.target.value)}
-                            className="bg-slate-800/50 text-slate-300 text-sm rounded-lg px-3 py-1.5 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 appearance-none cursor-pointer"
+                            className="bg-slate-800/50 text-slate-300 text-sm rounded-lg px-3 py-1.5 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500/50 appearance-none cursor-pointer"
                         >
                             <option value="" disabled>카테고리 선택</option>
                             {categories.map((cat) => (

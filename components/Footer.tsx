@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function Footer() {
     return (
@@ -6,17 +7,18 @@ export default function Footer() {
             <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-8">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="m4 6 4-2 8 4 4-2" /><path d="m18 10-4 2-8-4-4 2" /><path d="m4 14 4 2 8-4 4 2" />
-                        </svg>
+                    <div className="flex items-center justify-center">
+                        <Image src="/logo_only.png" alt="BioLogic.dev Logo" width={28} height={28} className="object-contain" />
                     </div>
-                    <span className="text-base font-bold text-[var(--text-primary)]">DevLog</span>
+                    <span className="text-lg font-bold tracking-tight -ml-0.5">
+                        <span className="text-[var(--text-primary)]">BioLogic</span>
+                        <span className="bg-gradient-to-r from-blue-500 to-teal-500 bg-clip-text text-transparent">.dev</span>
+                    </span>
                 </Link>
 
                 {/* Copyright */}
                 <p className="text-sm text-[var(--text-muted)]">
-                    © 2024 DevLog. All rights reserved.
+                    © 2024 BioLogic.dev. All rights reserved.
                 </p>
 
                 {/* Social Links */}

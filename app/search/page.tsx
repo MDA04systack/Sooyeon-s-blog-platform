@@ -52,7 +52,7 @@ export default async function SearchPage({
 
             <main className="flex-1 mx-auto max-w-5xl w-full px-6 py-12">
                 <div className="mb-12 border-b border-[var(--border)] pb-8">
-                    <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
+                    <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-purple-400">
                         {q ? `"${q}" 검색 결과` : '검색어를 입력해주세요'}
                     </h1>
                     {q && (
@@ -66,9 +66,9 @@ export default async function SearchPage({
                     <div className="space-y-16">
                         {/* Title Results */}
                         <section>
-                            <h2 className="text-xl font-bold mb-6 flex items-center gap-2 border-l-4 border-indigo-500 pl-3">
+                            <h2 className="text-xl font-bold mb-6 flex items-center gap-2 border-l-4 border-teal-500 pl-3">
                                 <span>제목에 포함된 게시글</span>
-                                <span className="text-sm font-normal text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full">
+                                <span className="text-sm font-normal text-teal-400 bg-teal-500/10 px-2 py-0.5 rounded-full">
                                     {titlePosts.length}
                                 </span>
                             </h2>

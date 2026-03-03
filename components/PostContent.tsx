@@ -47,7 +47,7 @@ export const MarkdownComponents: Components = {
         <li className="text-[var(--text-body)]">{children}</li>
     ),
     a: ({ href, children }) => (
-        <a href={href} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
+        <a href={href} target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:text-teal-300 hover:underline transition">
             {children}
         </a>
     ),
@@ -55,7 +55,7 @@ export const MarkdownComponents: Components = {
         <strong className="font-bold text-[var(--text-primary)]">{children}</strong>
     ),
     blockquote: ({ children }) => (
-        <blockquote className="my-6 border-l-4 border-indigo-500 bg-[var(--bg-input)] py-3 pr-4 pl-6 italic text-[var(--text-body)] rounded-r-lg">
+        <blockquote className="my-6 border-l-4 border-teal-500 bg-[var(--bg-input)] py-3 pr-4 pl-6 italic text-[var(--text-body)] rounded-r-lg">
             {children}
         </blockquote>
     ),
@@ -65,7 +65,7 @@ export const MarkdownComponents: Components = {
 
         if (isInline) {
             return (
-                <code className="rounded bg-[var(--bg-input)] px-1.5 py-0.5 text-sm font-mono text-indigo-500 dark:text-indigo-300 before:content-[''] after:content-['']" {...props}>
+                <code className="rounded bg-[var(--bg-input)] px-1.5 py-0.5 text-sm font-mono text-teal-500 dark:text-teal-300 before:content-[''] after:content-['']" {...props}>
                     {children}
                 </code>
             )

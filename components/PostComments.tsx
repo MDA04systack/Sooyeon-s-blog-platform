@@ -19,7 +19,7 @@ interface PostCommentsProps {
 }
 
 const textareaCls =
-    'w-full px-3 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-faint)] focus:outline-none focus:ring-2 focus:ring-indigo-500/60 resize-none transition-all'
+    'w-full px-3 py-2.5 text-sm bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-faint)] focus:outline-none focus:ring-2 focus:ring-teal-500/60 resize-none transition-all'
 
 function formatDate(iso: string) {
     const d = new Date(iso)
@@ -86,6 +86,9 @@ function CommentItem({
             <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
+                        <div className="h-6 w-6 rounded-full bg-[var(--bg-input)] flex items-center justify-center text-[var(--text-primary)] text-[10px] font-bold shrink-0">
+                            {(comment.profiles?.nickname ?? 'A').slice(0, 1).toUpperCase()}
+                        </div>
                         <span className="text-sm font-semibold text-[var(--text-primary)]">
                             {comment.profiles?.nickname ?? '알 수 없음'}
                         </span>
@@ -106,7 +109,7 @@ function CommentItem({
                             />
                             <div className="flex gap-2">
                                 <button onClick={handleSave} disabled={saving}
-                                    className="px-3 py-1 text-xs rounded-md bg-indigo-500 hover:bg-indigo-400 text-white transition-colors disabled:opacity-60">
+                                    className="px-3 py-1 text-xs rounded-md bg-teal-500 hover:bg-teal-400 text-white transition-colors disabled:opacity-60">
                                     {saving ? '저장 중...' : '저장'}
                                 </button>
                                 <button onClick={() => setIsEditing(false)}
@@ -124,7 +127,7 @@ function CommentItem({
                 <div className="flex items-center gap-1 shrink-0">
                     {!isReply && (
                         <button onClick={() => setIsReplying(r => !r)}
-                            className="text-xs px-2 py-1 rounded text-[var(--text-muted)] hover:text-indigo-400 hover:bg-indigo-500/10 transition-colors">
+                            className="text-xs px-2 py-1 rounded text-[var(--text-muted)] hover:text-teal-400 hover:bg-teal-500/10 transition-colors">
                             답글
                         </button>
                     )}
@@ -156,7 +159,7 @@ function CommentItem({
                     />
                     <div className="flex gap-2">
                         <button onClick={handleReply} disabled={saving}
-                            className="px-3 py-1 text-xs rounded-md bg-indigo-500 hover:bg-indigo-400 text-white transition-colors disabled:opacity-60">
+                            className="px-3 py-1 text-xs rounded-md bg-teal-500 hover:bg-teal-400 text-white transition-colors disabled:opacity-60">
                             답글 등록
                         </button>
                         <button onClick={() => setIsReplying(false)}
@@ -254,7 +257,7 @@ export default function PostComments({ postId }: PostCommentsProps) {
     return (
         <section className="mt-12">
             <h2 className="text-lg font-bold text-[var(--text-primary)] mb-4">
-                댓글 <span className="text-indigo-400">{comments.length}</span>
+                댓글 <span className="text-teal-400">{comments.length}</span>
             </h2>
 
             {user ? (
@@ -268,14 +271,14 @@ export default function PostComments({ postId }: PostCommentsProps) {
                     />
                     <div className="flex justify-end">
                         <button type="submit" disabled={submitting || !newComment.trim()}
-                            className="px-4 py-2 text-sm rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white font-medium transition-colors disabled:opacity-60">
+                            className="px-4 py-2 text-sm rounded-lg bg-teal-500 hover:bg-teal-400 text-white font-medium transition-colors disabled:opacity-60">
                             {submitting ? '등록 중...' : '댓글 등록'}
                         </button>
                     </div>
                 </form>
             ) : (
                 <p className="mb-6 text-sm text-[var(--text-muted)] p-3 bg-[var(--bg-input)] rounded-lg">
-                    댓글을 작성하려면 <a href="/login" className="text-indigo-400 hover:underline">로그인</a>이 필요합니다.
+                    댓글을 작성하려면 <a href="/login" className="text-teal-400 hover:underline">로그인</a>이 필요합니다.
                 </p>
             )}
 

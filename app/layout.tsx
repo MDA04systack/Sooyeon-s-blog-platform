@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DevLog - 개발자를 위한 기술 블로그",
+  title: "BioLogic.dev : 생물학적 논리를 코드로 구현하다",
   description: "프론트엔드, 백엔드, DevOps, 커리어 등 개발자를 위한 양질의 기술 아티클을 만나보세요.",
 };
 

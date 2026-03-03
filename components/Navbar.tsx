@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/utils/supabase/client'
 import { useTheme } from '@/components/ThemeProvider'
 import type { User } from '@supabase/supabase-js'
@@ -10,6 +11,7 @@ import type { User } from '@supabase/supabase-js'
 export default function Navbar() {
     const [user, setUser] = useState<User | null>(null)
     const [nickname, setNickname] = useState<string | null>(null)
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
     const [isAdmin, setIsAdmin] = useState(false)
     const [suspendedUntil, setSuspendedUntil] = useState<string | null>(null)
     const [searchValue, setSearchValue] = useState('')
@@ -19,14 +21,35 @@ export default function Navbar() {
 
     useEffect(() => {
         const loadUser = async (uid: string) => {
-            const { data: profile } = await supabase
+            // Try fetching with avatar_url first
+            let { data: profile, error } = await supabase
                 .from('profiles')
-                .select('nickname, role, suspended_until')
+                .select('nickname, role, suspended_until, avatar_url')
                 .eq('id', uid)
                 .single()
-            setNickname(profile?.nickname ?? null)
-            setIsAdmin(profile?.role === 'admin')
-            setSuspendedUntil(profile?.suspended_until ?? null)
+
+            // If it fails (likely due to missing avatar_url column if migration not run)
+            if (error) {
+                console.warn('Profile fetch with avatar_url failed, retrying without it:', error.message)
+                const { data: retryProfile, error: retryError } = await supabase
+                    .from('profiles')
+                    .select('nickname, role, suspended_until')
+                    .eq('id', uid)
+                    .single()
+
+                if (retryError) {
+                    console.error('Final profile fetch failed:', retryError.message)
+                    return
+                }
+                profile = retryProfile as any
+            }
+
+            if (profile) {
+                setNickname(profile.nickname ?? null)
+                setIsAdmin(profile.role === 'admin')
+                setSuspendedUntil(profile.suspended_until ?? null)
+                setAvatarUrl((profile as any).avatar_url ?? null)
+            }
         }
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setUser(session?.user ?? null)
@@ -35,6 +58,7 @@ export default function Navbar() {
                 setNickname(null)
                 setIsAdmin(false)
                 setSuspendedUntil(null)
+                setAvatarUrl(null)
             }
         })
         supabase.auth.getUser().then(({ data: { user } }) => {
@@ -54,12 +78,13 @@ export default function Navbar() {
             <div className="mx-auto flex max-w-7xl items-center gap-4 px-6 py-3">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2 shrink-0">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="m4 6 4-2 8 4 4-2" /><path d="m18 10-4 2-8-4-4 2" /><path d="m4 14 4 2 8-4 4 2" />
-                        </svg>
+                    <div className="flex items-center justify-center">
+                        <Image src="/logo_only.png" alt="BioLogic.dev Logo" width={40} height={40} className="object-contain" />
                     </div>
-                    <span className="text-lg font-bold text-[var(--text-primary)] tracking-tight">DevLog</span>
+                    <span className="text-xl font-bold tracking-tight -ml-1">
+                        <span className="text-[var(--text-primary)]">BioLogic</span>
+                        <span className="bg-gradient-to-r from-blue-500 to-teal-500 bg-clip-text text-transparent">.dev</span>
+                    </span>
                 </Link>
 
                 {/* Search Bar */}
@@ -70,7 +95,7 @@ export default function Navbar() {
                                 router.push(`/search?q=${encodeURIComponent(searchValue.trim())}`)
                             }
                         }}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-indigo-400 transition"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-teal-400 transition"
                     >
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                             <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
@@ -86,7 +111,7 @@ export default function Navbar() {
                                 router.push(`/search?q=${encodeURIComponent(searchValue.trim())}`)
                             }
                         }}
-                        className="w-full rounded-full bg-[var(--bg-input)] py-2 pl-9 pr-4 text-sm text-[var(--text-body)] placeholder-[var(--text-faint)] outline-none ring-1 ring-[var(--border)] transition focus:ring-indigo-500/60"
+                        className="w-full rounded-full bg-[var(--bg-input)] py-2 pl-9 pr-4 text-sm text-[var(--text-body)] placeholder-[var(--text-faint)] outline-none ring-1 ring-[var(--border)] transition focus:ring-teal-500/60"
                     />
                 </div>
 
@@ -120,25 +145,40 @@ export default function Navbar() {
                                     관리자 대시보드
                                 </Link>
                             )}
-                            <Link href="/mypage" className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] transition">
-                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                                마이 페이지
+
+                            <Link href="/mypage" className="flex items-center gap-2 group decoration-0">
+                                {avatarUrl ? (
+                                    <div className="relative h-8 w-8 overflow-hidden rounded-full ring-2 ring-teal-500/20 group-hover:ring-teal-500/40 transition">
+                                        <Image
+                                            src={avatarUrl}
+                                            alt={nickname || 'User avatar'}
+                                            fill
+                                            className="object-cover"
+                                            unoptimized
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-input)] text-[var(--text-primary)] text-[10px] font-bold ring-2 ring-teal-500/20 group-hover:ring-teal-500/40 transition">
+                                        {(nickname ?? user.email ?? 'U').slice(0, 1).toUpperCase()}
+                                    </div>
+                                )}
+                                <div className="hidden sm:flex flex-col items-start justify-center">
+                                    <span className="text-sm text-[var(--text-primary)] font-medium truncate max-w-[120px] group-hover:text-teal-400 transition">
+                                        {nickname ?? user.email}
+                                    </span>
+                                    {suspendedUntil && new Date(suspendedUntil) > new Date() && (
+                                        <span className="text-[10px] font-bold text-rose-500 bg-rose-500/10 px-1.5 py-[1px] rounded-sm tracking-tight">
+                                            정지됨
+                                        </span>
+                                    )}
+                                </div>
                             </Link>
 
-                            <Link href="/write" className="flex items-center gap-1.5 rounded-full bg-indigo-500/10 px-4 py-1.5 text-sm font-medium text-indigo-400 hover:bg-indigo-500/20 transition">
+                            <Link href="/write" className="hidden md:flex items-center gap-1.5 rounded-full bg-teal-500/10 px-4 py-1.5 text-sm font-medium text-teal-400 hover:bg-teal-500/20 transition">
                                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                 새 글 작성
                             </Link>
-                            <div className="hidden sm:flex flex-col items-end justify-center mr-1">
-                                <span className="text-sm text-[var(--text-primary)] font-medium truncate max-w-[120px]">
-                                    {nickname ?? user.email}
-                                </span>
-                                {suspendedUntil && new Date(suspendedUntil) > new Date() && (
-                                    <span className="text-[10px] font-bold text-rose-500 bg-rose-500/10 px-1.5 py-[1px] rounded-sm mt-0.5 tracking-tight">
-                                        활동 정지됨
-                                    </span>
-                                )}
-                            </div>
+
                             <button
                                 onClick={handleLogout}
                                 className="rounded-full px-4 py-1.5 text-sm font-medium text-[var(--text-body)] hover:text-[var(--text-primary)] ring-1 ring-[var(--border)] hover:ring-[var(--border-focus)] transition"
@@ -151,7 +191,7 @@ export default function Navbar() {
                             <Link href="/login" className="text-sm font-medium text-[var(--text-body)] hover:text-[var(--text-primary)] transition px-1">
                                 로그인
                             </Link>
-                            <Link href="/login" className="rounded-full bg-indigo-500 px-4 py-1.5 text-sm font-semibold text-white hover:bg-indigo-400 transition">
+                            <Link href="/login" className="rounded-full bg-teal-500 px-4 py-1.5 text-sm font-semibold text-white hover:bg-teal-400 transition">
                                 회원가입
                             </Link>
                         </>

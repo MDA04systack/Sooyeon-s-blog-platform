@@ -90,7 +90,7 @@ export default function PostList() {
                     <button
                         onClick={() => handleCategoryChange('all')}
                         className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${activeCategorySlug === 'all'
-                            ? 'bg-indigo-500 text-white'
+                            ? 'bg-teal-500 text-white'
                             : 'bg-[var(--bg-card)] text-[var(--text-muted)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)] ring-1 ring-[var(--border)]'
                             }`}
                     >
@@ -101,7 +101,7 @@ export default function PostList() {
                             key={cat.id}
                             onClick={() => handleCategoryChange(cat.slug)}
                             className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${activeCategorySlug === cat.slug
-                                ? 'bg-indigo-500 text-white'
+                                ? 'bg-teal-500 text-white'
                                 : 'bg-[var(--bg-card)] text-[var(--text-muted)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)] ring-1 ring-[var(--border)]'
                                 }`}
                         >
@@ -140,7 +140,7 @@ export default function PostList() {
                                         key={opt.id}
                                         onClick={() => handleSortChange(opt.id as any)}
                                         className={`w-full rounded-lg px-3 py-2 text-left text-sm transition transition-colors ${sortOption === opt.id
-                                            ? 'bg-indigo-500/10 text-indigo-500 font-medium'
+                                            ? 'bg-teal-500/10 text-teal-500 font-medium'
                                             : 'text-[var(--text-muted)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)]'
                                             }`}
                                     >
@@ -190,7 +190,7 @@ export default function PostList() {
 
             {loading && posts.length > 0 && (
                 <div className="mt-12 flex justify-center">
-                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
+                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-teal-500 border-t-transparent" />
                 </div>
             )}
         </section>

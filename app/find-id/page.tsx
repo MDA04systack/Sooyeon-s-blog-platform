@@ -11,7 +11,7 @@ export default function FindIdPage() {
     const [sent, setSent] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
-    const inputCls = "w-full px-4 py-2.5 bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder:text-[var(--text-faint)]"
+    const inputCls = "w-full px-4 py-2.5 bg-[var(--bg-input)] border border-[var(--border)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all placeholder:text-[var(--text-faint)]"
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
@@ -66,11 +66,11 @@ export default function FindIdPage() {
                                 className={inputCls} placeholder="name@example.com" />
                         </div>
                         <button type="submit" disabled={loading}
-                            className="w-full py-3 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white font-medium text-sm transition-colors disabled:opacity-60">
+                            className="w-full py-3 rounded-lg bg-teal-500 hover:bg-teal-400 text-white font-medium text-sm transition-colors disabled:opacity-60">
                             {loading ? '발송 중...' : '아이디 찾기 이메일 보내기'}
                         </button>
                         <Link href="/login"
-                            className="block text-center text-sm text-[var(--text-muted)] hover:text-indigo-400 transition-colors">
+                            className="block text-center text-sm text-[var(--text-muted)] hover:text-teal-400 transition-colors">
                             ← 로그인으로 돌아가기
                         </Link>
                     </form>

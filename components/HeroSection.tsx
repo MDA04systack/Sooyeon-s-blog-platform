@@ -98,24 +98,28 @@ export default function HeroSection() {
                         )}
                         <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/30 to-transparent p-6">
                             {featured.is_featured && (
-                                <span className="mb-3 inline-block w-fit rounded-full bg-indigo-500 px-3 py-0.5 text-xs font-semibold text-white">
+                                <span className="mb-3 inline-block w-fit rounded-full bg-teal-500 px-3 py-0.5 text-xs font-semibold text-white">
                                     ★ Featured
                                 </span>
                             )}
-                            <h2 className="mb-2 text-2xl font-bold leading-snug text-white group-hover:text-indigo-200 transition">
+                            <h2 className="mb-2 text-2xl font-bold leading-snug text-white group-hover:text-teal-200 transition">
                                 {featured.title}
                             </h2>
                             <p className="mb-4 text-sm text-slate-300 line-clamp-2">{featured.excerpt}</p>
                             <div className="flex items-center gap-2">
-                                {featured.author_avatar_url && (
+                                {featured.author_avatar_url ? (
                                     <Image
                                         src={featured.author_avatar_url}
                                         alt={featured.author_name}
                                         width={24}
                                         height={24}
-                                        className="rounded-full bg-slate-700"
+                                        className="rounded-full bg-slate-700 object-cover"
                                         unoptimized
                                     />
+                                ) : (
+                                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-700 text-white text-[10px] font-bold">
+                                        {featured.author_name.slice(0, 1).toUpperCase()}
+                                    </div>
                                 )}
                                 <span className="text-sm text-slate-300">{featured.author_name}</span>
                                 <span className="text-slate-500">·</span>
@@ -151,11 +155,11 @@ export default function HeroSection() {
                                             ★ Featured
                                         </span>
                                     )}
-                                    <span className="text-xs font-bold uppercase tracking-widest text-indigo-400">
+                                    <span className="text-xs font-bold uppercase tracking-widest text-teal-400">
                                         {post.categories?.name || '일반'}
                                     </span>
                                 </div>
-                                <h3 className="text-base font-bold text-white leading-snug group-hover:text-indigo-200 transition line-clamp-2">
+                                <h3 className="text-base font-bold text-white leading-snug group-hover:text-teal-200 transition line-clamp-2">
                                     {post.title}
                                 </h3>
                                 <p className="mt-1 text-xs text-slate-400 line-clamp-2">{post.excerpt}</p>
