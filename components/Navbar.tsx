@@ -81,10 +81,15 @@ export default function Navbar() {
                     <div className="flex items-center justify-center">
                         <Image src="/logo.png" alt="BioLogic.dev Logo" width={40} height={40} className="object-contain" />
                     </div>
-                    <span className="text-xl font-bold tracking-tight -ml-1">
-                        <span className="text-[var(--text-primary)]">BioLogic</span>
-                        <span className="bg-gradient-to-r from-blue-500 to-teal-500 bg-clip-text text-transparent">.dev</span>
-                    </span>
+                    <div className="flex flex-col -ml-1">
+                        <span className="text-xl font-bold tracking-tight leading-none">
+                            <span className="text-[var(--text-primary)]">BioLogic</span>
+                            <span className="bg-gradient-to-r from-blue-500 to-teal-500 bg-clip-text text-transparent">.dev</span>
+                        </span>
+                        <span className="text-[10px] font-light text-[var(--text-muted)] tracking-wider mt-0.5">
+                            AI Solution & Pipeline Builder
+                        </span>
+                    </div>
                 </Link>
 
                 {/* Search Bar */}
