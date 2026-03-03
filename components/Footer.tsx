@@ -18,7 +18,7 @@ export default function Footer() {
 
                 {/* Copyright */}
                 <p className="text-sm text-[var(--text-muted)]">
-                    © 2024 BioLogic.dev. All rights reserved.
+                    © 2026 BioLogic.dev. All rights reserved.
                 </p>
 
                 {/* Social Links */}
