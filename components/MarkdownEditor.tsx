@@ -166,9 +166,9 @@ export default function MarkdownEditor({ user }: MarkdownEditorProps) {
     }
 
     return (
-        <div className="flex h-screen flex-col overflow-hidden bg-[#0f172a] text-slate-300">
+        <div className="flex h-screen flex-col overflow-hidden bg-[var(--bg-primary)] text-[var(--text-body)]">
             {/* Top Bar */}
-            <header className="flex h-14 shrink-0 items-center justify-between border-b border-slate-800 px-4">
+            <header className="flex h-14 shrink-0 items-center justify-between border-b border-[var(--border)] px-4">
                 <div className="flex items-center gap-4">
                     <Link href="/" className="flex items-center gap-2 group">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-500/10 text-teal-400 group-hover:bg-teal-500/20 transition">
@@ -178,11 +178,11 @@ export default function MarkdownEditor({ user }: MarkdownEditorProps) {
                         </div>
                     </Link>
                     <div className="flex items-center gap-3">
-                        <span className="text-sm font-semibold text-white">New Post</span>
-                        <div className="h-4 w-px bg-slate-800" />
-                        <span className="text-sm text-slate-500">{status === 'draft' ? 'Draft' : status}</span>
+                        <span className="text-sm font-semibold text-[var(--text-primary)]">New Post</span>
+                        <div className="h-4 w-px bg-[var(--border)]" />
+                        <span className="text-sm text-[var(--text-faint)]">{status === 'draft' ? 'Draft' : status}</span>
                         {lastSaved && (
-                            <span className="text-xs text-slate-500">
+                            <span className="text-xs text-[var(--text-faint)]">
                                 마지막 저장: {lastSaved.toLocaleTimeString()}
                             </span>
                         )}
@@ -193,10 +193,10 @@ export default function MarkdownEditor({ user }: MarkdownEditorProps) {
                     <button
                         onClick={() => handleSave('draft')}
                         disabled={isSaving}
-                        className="flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-1.5 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition disabled:opacity-50"
+                        className="flex items-center gap-2 rounded-lg bg-[var(--bg-input)] px-4 py-1.5 text-sm font-medium text-[var(--text-body)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)] transition disabled:opacity-50 border border-[var(--border)]"
                     >
                         {isSaving ? (
-                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-400 border-t-transparent" />
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--text-muted)] border-t-transparent" />
                         ) : (
                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
@@ -220,10 +220,10 @@ export default function MarkdownEditor({ user }: MarkdownEditorProps) {
                         {showPublishMenu && (
                             <>
                                 <div className="fixed inset-0 z-10" onClick={() => setShowPublishMenu(false)} />
-                                <div className="absolute right-0 top-full mt-2 w-40 rounded-xl border border-slate-700 bg-slate-800 p-1 shadow-xl z-20">
+                                <div className="absolute right-0 top-full mt-2 w-40 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-1 shadow-xl z-20">
                                     <button
                                         onClick={() => handleSave('published')}
-                                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white"
+                                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[var(--text-body)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)]"
                                     >
                                         <svg className="h-4 w-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
@@ -232,7 +232,7 @@ export default function MarkdownEditor({ user }: MarkdownEditorProps) {
                                     </button>
                                     <button
                                         onClick={() => handleSave('private')}
-                                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white"
+                                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[var(--text-body)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)]"
                                     >
                                         <svg className="h-4 w-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -247,43 +247,43 @@ export default function MarkdownEditor({ user }: MarkdownEditorProps) {
             </header>
 
             {/* Toolbar */}
-            <div className="flex h-10 shrink-0 items-center justify-between border-b border-slate-800 bg-slate-900/50 px-4">
+            <div className="flex h-10 shrink-0 items-center justify-between border-b border-[var(--border)] bg-[var(--bg-muted)] px-4">
                 <div className="flex items-center gap-1">
-                    <button onClick={() => insertText('**', '**')} className="flex h-8 w-8 items-center justify-center rounded text-slate-400 hover:bg-slate-800 hover:text-white" title="Bold">
+                    <button onClick={() => insertText('**', '**')} className="flex h-8 w-8 items-center justify-center rounded text-[var(--text-muted)] hover:bg-[var(--bg-input)] hover:text-[var(--text-primary)]" title="Bold">
                         <span className="font-bold">B</span>
                     </button>
-                    <button onClick={() => insertText('*', '*')} className="flex h-8 w-8 items-center justify-center rounded text-slate-400 hover:bg-slate-800 hover:text-white" title="Italic">
+                    <button onClick={() => insertText('*', '*')} className="flex h-8 w-8 items-center justify-center rounded text-[var(--text-muted)] hover:bg-[var(--bg-input)] hover:text-[var(--text-primary)]" title="Italic">
                         <span className="italic">I</span>
                     </button>
-                    <button onClick={() => insertText('~~', '~~')} className="flex h-8 w-8 items-center justify-center rounded text-slate-400 hover:bg-slate-800 hover:text-white" title="Strikethrough">
+                    <button onClick={() => insertText('~~', '~~')} className="flex h-8 w-8 items-center justify-center rounded text-[var(--text-muted)] hover:bg-[var(--bg-input)] hover:text-[var(--text-primary)]" title="Strikethrough">
                         <span className="line-through">S</span>
                     </button>
-                    <div className="mx-2 h-4 w-px bg-slate-700" />
-                    <button onClick={() => insertText('## ')} className="flex h-8 w-8 items-center justify-center rounded text-slate-400 hover:bg-slate-800 hover:text-white font-bold" title="Heading 2">
+                    <div className="mx-2 h-4 w-px bg-[var(--border)]" />
+                    <button onClick={() => insertText('## ')} className="flex h-8 w-8 items-center justify-center rounded text-[var(--text-muted)] hover:bg-[var(--bg-input)] hover:text-[var(--text-primary)] font-bold" title="Heading 2">
                         H2
                     </button>
-                    <button onClick={() => insertText('### ')} className="flex h-8 w-8 items-center justify-center rounded text-slate-400 hover:bg-slate-800 hover:text-white font-bold" title="Heading 3">
+                    <button onClick={() => insertText('### ')} className="flex h-8 w-8 items-center justify-center rounded text-[var(--text-muted)] hover:bg-[var(--bg-input)] hover:text-[var(--text-primary)] font-bold" title="Heading 3">
                         H3
                     </button>
-                    <div className="mx-2 h-4 w-px bg-slate-700" />
-                    <button onClick={() => insertText('> ')} className="flex h-8 w-8 items-center justify-center rounded text-slate-400 hover:bg-slate-800 hover:text-white text-lg font-serif font-bold" title="Quote">
+                    <div className="mx-2 h-4 w-px bg-[var(--border)]" />
+                    <button onClick={() => insertText('> ')} className="flex h-8 w-8 items-center justify-center rounded text-[var(--text-muted)] hover:bg-[var(--bg-input)] hover:text-[var(--text-primary)] text-lg font-serif font-bold" title="Quote">
                         "
                     </button>
-                    <button onClick={() => insertText('```\n', '\n```')} className="flex h-8 w-8 items-center justify-center rounded text-slate-400 hover:bg-slate-800 hover:text-white" title="Code Block">
+                    <button onClick={() => insertText('```\n', '\n```')} className="flex h-8 w-8 items-center justify-center rounded text-[var(--text-muted)] hover:bg-[var(--bg-input)] hover:text-[var(--text-primary)]" title="Code Block">
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
                     </button>
-                    <button onClick={() => insertText('[', '](url)')} className="flex h-8 w-8 items-center justify-center rounded text-slate-400 hover:bg-slate-800 hover:text-white" title="Link">
+                    <button onClick={() => insertText('[', '](url)')} className="flex h-8 w-8 items-center justify-center rounded text-[var(--text-muted)] hover:bg-[var(--bg-input)] hover:text-[var(--text-primary)]" title="Link">
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
                     </button>
                     {/* Image Upload Button */}
                     <button
                         onClick={() => imageInputRef.current?.click()}
                         disabled={isUploading}
-                        className="flex h-8 w-8 items-center justify-center rounded text-slate-400 hover:bg-slate-800 hover:text-white disabled:opacity-50 disabled:cursor-wait"
+                        className="flex h-8 w-8 items-center justify-center rounded text-[var(--text-muted)] hover:bg-[var(--bg-input)] hover:text-[var(--text-primary)] disabled:opacity-50 disabled:cursor-wait"
                         title="이미지 업로드"
                     >
                         {isUploading ? (
-                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-400 border-t-transparent" />
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--text-muted)] border-t-transparent" />
                         ) : (
                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                         )}
@@ -296,7 +296,7 @@ export default function MarkdownEditor({ user }: MarkdownEditorProps) {
                         onChange={handleImageUpload}
                     />
                 </div>
-                <div className="flex items-center gap-2 text-xs text-slate-500">
+                <div className="flex items-center gap-2 text-xs text-[var(--text-faint)]">
                     {isUploading ? (
                         <span className="text-teal-400 animate-pulse">업로드 중...</span>
                     ) : (
@@ -311,12 +311,12 @@ export default function MarkdownEditor({ user }: MarkdownEditorProps) {
             {/* Split Panes */}
             <div className="flex flex-1 overflow-hidden">
                 {/* Editor Pane */}
-                <div className="flex w-1/2 flex-col border-r border-slate-800 pr-2">
+                <div className="flex w-1/2 flex-col border-r border-[var(--border)] pr-2">
                     <div className="px-6 pt-6 flex items-center">
                         <select
                             value={selectedCategoryId}
                             onChange={(e) => setSelectedCategoryId(e.target.value)}
-                            className="bg-slate-800/50 text-slate-300 text-sm rounded-lg px-3 py-1.5 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500/50 appearance-none cursor-pointer"
+                            className="bg-[var(--bg-input)] text-[var(--text-body)] text-sm rounded-lg px-3 py-1.5 border border-[var(--border)] focus:outline-none focus:ring-2 focus:ring-teal-500/50 appearance-none cursor-pointer"
                         >
                             <option value="" disabled>카테고리 선택</option>
                             {categories.map((cat) => (
@@ -331,21 +331,21 @@ export default function MarkdownEditor({ user }: MarkdownEditorProps) {
                         placeholder="제목을 입력하세요"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        className="w-full bg-transparent p-6 text-4xl font-bold text-white placeholder:text-slate-600 focus:outline-none"
+                        className="w-full bg-transparent p-6 text-4xl font-bold text-[var(--text-primary)] placeholder:text-[var(--text-faint)] focus:outline-none"
                     />
                     <textarea
                         ref={textareaRef}
                         placeholder="여기에 내용을 입력하세요..."
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        className="w-full flex-1 resize-none bg-transparent p-6 pt-0 text-lg leading-relaxed text-slate-300 placeholder:text-slate-600 focus:outline-none"
+                        className="w-full flex-1 resize-none bg-transparent p-6 pt-0 text-lg leading-relaxed text-[var(--text-body)] placeholder:text-[var(--text-faint)] focus:outline-none"
                     />
                 </div>
 
                 {/* Preview Pane */}
                 <div className="w-1/2 overflow-y-auto p-8 lg:px-12">
                     <div className="mb-4 flex items-center gap-2">
-                        <span className="text-xs font-bold uppercase tracking-widest text-slate-500">PREVIEW</span>
+                        <span className="text-xs font-bold uppercase tracking-widest text-[var(--text-faint)]">PREVIEW</span>
                         <div className="ml-auto flex gap-1.5">
                             <div className="h-2.5 w-2.5 rounded-full bg-rose-500/80" />
                             <div className="h-2.5 w-2.5 rounded-full bg-amber-500/80" />
@@ -353,11 +353,11 @@ export default function MarkdownEditor({ user }: MarkdownEditorProps) {
                         </div>
                     </div>
 
-                    <h1 className="mb-8 text-4xl font-bold text-white leading-tight">
+                    <h1 className="mb-8 text-4xl font-bold text-[var(--text-primary)] leading-tight">
                         {title || '제목을 입력하세요'}
                     </h1>
 
-                    <div className="text-base text-slate-300">
+                    <div className="text-base text-[var(--text-body)]">
                         <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
                             components={MarkdownComponents}
@@ -369,14 +369,14 @@ export default function MarkdownEditor({ user }: MarkdownEditorProps) {
             </div>
 
             {/* Footer Status Bar */}
-            <footer className="flex h-8 shrink-0 items-center justify-between border-t border-slate-800 bg-[#0f172a] px-4 text-xs text-slate-500">
+            <footer className="flex h-8 shrink-0 items-center justify-between border-t border-[var(--border)] bg-[var(--bg-primary)] px-4 text-xs text-[var(--text-faint)]">
                 <div className="flex items-center gap-4">
                     <span>Lines: {content.split('\n').length}</span>
                     <span>Words: {wordCount}</span>
                     <span>Characters: {charCount}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <span className={`h-2 w-2 rounded-full ${content.length > 0 ? 'bg-emerald-500' : 'bg-slate-600'}`} />
+                    <span className={`h-2 w-2 rounded-full ${content.length > 0 ? 'bg-emerald-500' : 'bg-[var(--text-faint)]'}`} />
                     {status === 'draft' ? 'Draft' : 'Saved'}
                 </div>
             </footer>
