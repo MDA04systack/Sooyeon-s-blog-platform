@@ -25,26 +25,40 @@ export default function HeroSection() {
         const fetchHeroPosts = async () => {
             const supabase = createClient()
 
+            // Fetch up to 3 featured posts
             const { data: featuredData } = await supabase
                 .from('posts')
                 .select('*, categories(name, slug)')
                 .eq('status', 'published')
                 .eq('is_featured', true)
                 .order('published_at', { ascending: false })
-                .limit(1)
-                .single()
+                .limit(3)
 
-            // Fetch 2 side posts (not featured)
-            const { data: sideData } = await supabase
-                .from('posts')
-                .select('*, categories(name, slug)')
-                .eq('status', 'published')
-                .eq('is_featured', false)
-                .order('published_at', { ascending: false })
-                .limit(2)
+            const featuredCount = featuredData ? featuredData.length : 0
+            const neededNormalPosts = 3 - featuredCount
 
-            setFeatured(featuredData)
-            setSidePosts(sideData || [])
+            // Fetch normal posts to fill the rest of the 3 slots (if needed)
+            let normalData: any[] = []
+            if (neededNormalPosts > 0) {
+                const { data } = await supabase
+                    .from('posts')
+                    .select('*, categories(name, slug)')
+                    .eq('status', 'published')
+                    .eq('is_featured', false) // Exclude featured to avoid duplicates
+                    .order('published_at', { ascending: false })
+                    .limit(neededNormalPosts)
+
+                normalData = data || []
+            }
+
+            // Combine into one array of exactly up to 3 posts
+            const combinedPosts = [...(featuredData || []), ...normalData].slice(0, 3)
+
+            // The first one goes to the large left 'featured' slot
+            setFeatured(combinedPosts.length > 0 ? combinedPosts[0] : null)
+            // The remaining (up to 2) go to the right 'sidePosts' slot
+            setSidePosts(combinedPosts.slice(1))
+
             setLoading(false)
         }
 
@@ -83,9 +97,11 @@ export default function HeroSection() {
                             </div>
                         )}
                         <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/30 to-transparent p-6">
-                            <span className="mb-3 inline-block w-fit rounded-full bg-indigo-500 px-3 py-0.5 text-xs font-semibold text-white">
-                                Featured
-                            </span>
+                            {featured.is_featured && (
+                                <span className="mb-3 inline-block w-fit rounded-full bg-indigo-500 px-3 py-0.5 text-xs font-semibold text-white">
+                                    ★ Featured
+                                </span>
+                            )}
                             <h2 className="mb-2 text-2xl font-bold leading-snug text-white group-hover:text-indigo-200 transition">
                                 {featured.title}
                             </h2>
@@ -129,9 +145,16 @@ export default function HeroSection() {
                                 </div>
                             )}
                             <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/20 to-transparent p-4">
-                                <span className="mb-1 text-xs font-bold uppercase tracking-widest text-indigo-400">
-                                    {post.categories?.name || '일반'}
-                                </span>
+                                <div className="flex gap-2 mb-1">
+                                    {post.is_featured && (
+                                        <span className="text-xs font-bold uppercase tracking-widest text-yellow-400">
+                                            ★ Featured
+                                        </span>
+                                    )}
+                                    <span className="text-xs font-bold uppercase tracking-widest text-indigo-400">
+                                        {post.categories?.name || '일반'}
+                                    </span>
+                                </div>
                                 <h3 className="text-base font-bold text-white leading-snug group-hover:text-indigo-200 transition line-clamp-2">
                                     {post.title}
                                 </h3>

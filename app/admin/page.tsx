@@ -6,6 +6,7 @@ import { createClient } from '@/utils/supabase/client'
 import type { User } from '@supabase/supabase-js'
 import Navbar from '@/components/Navbar'
 import { sendSuspensionEmail, sendUnsuspensionEmail } from '@/app/actions/sendEmail'
+import { revalidateHome } from '@/app/actions/revalidate'
 
 type Tab = 'users' | 'posts' | 'categories' | 'settings'
 
@@ -246,6 +247,7 @@ function PostsAdminTab({ supabase }: { supabase: any }) {
 
         alert('게시물 상단 고정 설정이 안전하게 저장되었습니다.')
         await loadPosts()
+        await revalidateHome() // 메인 페이지 캐시 무효화
         setIsSaving(false)
         router.refresh() // 강제로 서버 컴포넌트 데이터 갱신 유도
     }
@@ -259,6 +261,7 @@ function PostsAdminTab({ supabase }: { supabase: any }) {
             alert('상태 변경 실패: ' + error.message)
             return
         }
+        await revalidateHome() // 메인 페이지 캐시 무효화
         loadPosts()
     }
 
@@ -269,6 +272,7 @@ function PostsAdminTab({ supabase }: { supabase: any }) {
             alert('삭제 실패: ' + error.message)
             return
         }
+        await revalidateHome() // 메인 페이지 캐시 무효화
         loadPosts()
     }
 
