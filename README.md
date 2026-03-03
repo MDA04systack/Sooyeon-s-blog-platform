@@ -2,7 +2,7 @@
 
 현대적인 웹 기술 스택인 **Next.js**와 **Supabase**를 활용하여 구축된 개인 블로그 및 게시물 공유 플랫폼입니다. 아이디 기반 인증, 닉네임 시스템, 댓글 및 북마크 기능을 갖춘 완성도 높은 블로그 서비스입니다.
 
-🔗 **[Live Demo 보러가기](https://sooyeon-s-blog-platform.vercel.app/)**
+🔗 **[블로그 보러가기](https://sooyeon-s-blog-platform.vercel.app/)**
 
 ## 🚀 기술 스택 (Tech Stack)
 
